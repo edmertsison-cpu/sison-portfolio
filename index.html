@@ -295,7 +295,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
       const of=h=>((h.type||"Other").trim()||"Other")===t;
       const p=holdings.filter(h=>of(h)&&h.region!=="GLOBAL").reduce((s,h)=>s+valuePHP(h),0);
       const g=holdings.filter(h=>of(h)&&h.region==="GLOBAL").reduce((s,h)=>s+valuePHP(h),0);
-      const v=p+g, max=valuePHP0(types,total);
+      const v=p+g, max=v; // each bar is full width, split by PH vs Global share of this type
       const n=holdings.filter(of).length;
       const w=x=>max?(x/max*100):0;
       return `<div class="tb">
