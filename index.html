@@ -96,6 +96,15 @@ h2{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.01e
   .row .c::before{content:attr(data-l);display:block;font-family:var(--body);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
   .row .tv{grid-column:1/-1;font-size:16px}
 }
+.tkey{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tkey i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-left:6px}
+.tb{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.tb .tn{font-weight:600;display:flex;align-items:center;gap:8px;min-width:0}
+.tb .tn i{width:9px;height:9px;border-radius:2px;flex:none}
+.tb .tv{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
+.tb .track{grid-column:1/-1;height:10px;border-radius:99px;background:var(--raise);overflow:hidden;display:flex}
+.tb .track span{height:100%}
+.tb .meta{grid-column:1/-1;display:flex;white-space:nowrap;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .empty{padding:22px 4px;color:var(--muted)}
 .note{margin-top:28px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
@@ -145,6 +154,11 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
       <div class="legend" id="legend"></div>
     </div>
   </div>
+
+  <section id="byType" aria-label="Value by asset type">
+    <div class="sechead"><h2>By asset type</h2><span class="count tkey"><i style="background:var(--gold)"></i>Philippines <i style="background:var(--green)"></i>Global</span></div>
+    <div id="typeBars"></div>
+  </section>
 
   <section id="sec-PH"></section>
   <section id="sec-GLOBAL"></section>
@@ -271,10 +285,29 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
 
     $("typeList").innerHTML=[...new Set(["Stock","ETF","Mutual fund","Gold","MP2","Bonds","Cash","Crypto","Real estate",...types])].map(t=>`<option value="${esc(t)}">`).join("");
 
+    renderTypeBars(types,colors,total);
     renderSection("PH","Philippine assets",ph,phT,colors);
     renderSection("GLOBAL","Global assets",gl,glT,colors);
   }
 
+  function renderTypeBars(types,colors,total){
+    const rows=types.map(t=>{
+      const of=h=>((h.type||"Other").trim()||"Other")===t;
+      const p=holdings.filter(h=>of(h)&&h.region!=="GLOBAL").reduce((s,h)=>s+valuePHP(h),0);
+      const g=holdings.filter(h=>of(h)&&h.region==="GLOBAL").reduce((s,h)=>s+valuePHP(h),0);
+      const v=p+g, max=valuePHP0(types,total);
+      const n=holdings.filter(of).length;
+      const w=x=>max?(x/max*100):0;
+      return `<div class="tb">
+        <span class="tn"><i style="background:${colors[t]}"></i>${esc(t)}</span><span class="tv">${php(v)}</span>
+        <div class="track" role="img" aria-label="${esc(t)}: Philippines ${phpShort(p)}, Global ${phpShort(g)}"><span style="width:${w(p)}%;background:var(--gold)"></span><span style="width:${w(g)}%;background:var(--green)"></span></div>
+        <div class="meta"><span>${n} position${n===1?"":"s"}</span><span>${total?(Math.round(v/total*1000)/10):0}% of total</span></div>${p&&g?`<div class="meta"><span>Philippines ${phpShort(p)}</span><span>Global ${phpShort(g)}</span></div>`:""}
+      </div>`}).join("");
+    $("typeBars").innerHTML=rows||`<div class="empty">No assets yet.</div>`;
+  }
+  function valuePHP0(types){ // largest type total, so bars scale to the biggest type
+    let m=0; types.forEach(t=>{const v=holdings.filter(h=>((h.type||"Other").trim()||"Other")===t).reduce((s,h)=>s+valuePHP(h),0); if(v>m)m=v}); return m;
+  }
   function renderSection(key,title,list,sum,colors){
     const tOf=h=>(h.type||"Other").trim()||"Other";
     const groupTot={}; list.forEach(h=>{groupTot[tOf(h)]=(groupTot[tOf(h)]||0)+valuePHP(h)});
