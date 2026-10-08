@@ -35,7 +35,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
 .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.asof{color:var(--muted);font-size:14px}
+.eyebrow.title{font-size:17px;letter-spacing:.12em;color:var(--fg)}
+.asof{color:var(--muted);font-size:15px;margin-top:2px}
 .btn{font:inherit;font-weight:600;font-size:14px;border-radius:999px;padding:9px 16px;border:1px solid var(--line);background:var(--raise);color:var(--fg);cursor:pointer}
 .btn:hover{border-color:var(--brass)}
 .btn.primary{background:var(--brass);color:#1a1405;border-color:var(--brass)}
@@ -111,7 +112,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
 <div class="wrap">
   <div class="top">
     <div>
-      <div class="eyebrow">Gross portfolio</div>
+      <div class="eyebrow title">Gross portfolio</div>
       <div class="asof" id="asof">—</div>
     </div>
     <div class="actions" id="ownerActions">
@@ -330,13 +331,13 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     $("btnSave").disabled=true;
     try{
       if(editingId){holdings=holdings.map(h=>h.id===editingId?{id:editingId,...doc}:h)}else{holdings.push({id:newId(),...doc})}
-      save(); $("dlg").close();
+      stamp(); save(); $("dlg").close();
     }catch(err){showErr($("formErr"),"Couldn't save: "+(err&&err.message||"try again."))}
     finally{$("btnSave").disabled=false}
   });
   $("btnDelete").onclick=async()=>{
     if(!delArmed){delArmed=true;$("btnDelete").textContent="Tap again to delete";return}
-    try{holdings=holdings.filter(h=>h.id!==editingId);save();$("dlg").close()}
+    try{holdings=holdings.filter(h=>h.id!==editingId);stamp();save();$("dlg").close()}
     catch(err){showErr($("formErr"),"Couldn't delete: "+(err&&err.message||"try again."))}
   };
 
@@ -353,6 +354,8 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
 
   // ---- Local storage: data lives only in this browser, never in the repo ----
   function newId(){return "a"+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+  function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+  function stamp(){settings={...settings,asOf:today()}}
   function save(){
     try{localStorage.setItem(KEY,JSON.stringify({holdings,settings,savedAt:new Date().toISOString()}))}
     catch(e){$("status").textContent="Couldn't save in this browser. Use Backup to keep a copy."}
