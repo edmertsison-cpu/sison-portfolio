@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f1517">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Portfolio">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Sison Family Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one ledger column — summary + allocation donut on top, then Philippines and Global holdings blocks. Dark-first. */
+:root{
+  --bg:#0f1517; --surface:#161e21; --raise:#1d272b; --line:#2a373c;
+  --fg:#e8ece9; --muted:#8c9a97; --brass:#d9b25f; --jade:#5fb7a0; --neg:#e57c6b;
+  --display:"Fraunces",Georgia,serif; --body:"Instrument Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f5f3ee; --surface:#fffdf9; --raise:#efece5; --line:#ddd8cd;
+  --fg:#1b2422; --muted:#66706d; --brass:#9a7426; --jade:#2c7d68; --neg:#b4432f; color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#f5f3ee; --surface:#fffdf9; --raise:#efece5; --line:#ddd8cd;
+  --fg:#1b2422; --muted:#66706d; --brass:#9a7426; --jade:#2c7d68; --neg:#b4432f; color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45}
+.wrap{max-width:960px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) 16px calc(48px + env(safe-area-inset-bottom,0px))}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.asof{color:var(--muted);font-size:14px}
+.btn{font:inherit;font-weight:600;font-size:14px;border-radius:999px;padding:9px 16px;border:1px solid var(--line);background:var(--raise);color:var(--fg);cursor:pointer}
+.btn:hover{border-color:var(--brass)}
+.btn.primary{background:var(--brass);color:#1a1405;border-color:var(--brass)}
+.btn.danger{color:var(--neg)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,.row:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.summary{margin-top:22px;padding-bottom:24px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center}
+@media (max-width:640px){.summary{grid-template-columns:1fr}}
+.total{font-family:var(--mono);font-weight:600;font-size:clamp(34px,8vw,56px);letter-spacing:-.03em;line-height:1.05;margin:6px 0 8px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.subline{color:var(--muted);font-size:14px}
+.split{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.split div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.split b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px;overflow-wrap:anywhere}
+.split .pct{color:var(--muted);font-size:13px}
+.bar{display:flex;height:8px;border-radius:99px;overflow:hidden;margin-top:14px;background:var(--raise)}
+.bar span{display:block;height:100%}
+
+.chart{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.donut{width:180px;height:180px;flex:none}
+.legend{display:grid;gap:7px;min-width:180px}
+.legend div{display:grid;grid-template-columns:10px 1fr auto;gap:10px;align-items:center;font-size:14px}
+.legend i{width:10px;height:10px;border-radius:3px}
+.legend .num{color:var(--muted)}
+
+section{margin-top:34px}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:2px solid var(--brass);padding-bottom:8px}
+h2{font-family:var(--display);font-weight:600;font-size:26px;margin:0;color:var(--brass)}
+.count{color:var(--muted);font-size:13px}
+.thead,.row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.2fr);gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line)}
+.thead{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;padding-block:10px}
+.thead span:not(:first-child),.row .c{text-align:right}
+.row{cursor:default}
+.grp{display:flex;justify-content:space-between;gap:12px;padding:14px 4px 6px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line)}
+.grp span:first-child{display:flex;align-items:center;gap:8px}
+.grp i{width:8px;height:8px;border-radius:2px}
+.grp .num{letter-spacing:0;text-transform:none;font-size:13px}
+.row.editable{cursor:pointer}
+.row.editable:hover{background:var(--surface)}
+.nm{font-weight:600;overflow-wrap:anywhere}
+.chip{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.04em;padding:1px 8px;border-radius:99px;margin-top:3px;border:1px solid var(--line);color:var(--muted)}
+.row .c{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;overflow-wrap:anywhere}
+.row .tv{font-weight:600}
+.sub{color:var(--muted);font-size:12px}
+.foot{display:flex;justify-content:space-between;padding:14px 4px;font-weight:600}
+.foot .num{font-size:16px}
+@media (max-width:560px){
+  .thead{display:none}
+  .row{grid-template-columns:1fr 1fr;row-gap:6px}
+  .row .who{grid-column:1/-1}
+  .row .c{text-align:left}
+  .row .c::before{content:attr(data-l);display:block;font-family:var(--body);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .row .tv{grid-column:1/-1;font-size:16px}
+}
+.empty{padding:22px 4px;color:var(--muted)}
+.note{margin-top:28px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+dialog{background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:0;width:min(460px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+form{padding:20px;display:grid;gap:12px}
+form h3{font-family:var(--display);font-weight:600;font-size:22px;margin:0}
+label{display:grid;gap:4px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:12px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400}
+.formact{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px}
+.err{color:var(--neg);font-size:13px}
+@media (prefers-reduced-motion:no-preference){.bar span,.donut circle{transition:all .4s ease}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Gross portfolio</div>
+      <div class="asof" id="asof">—</div>
+    </div>
+    <div class="actions" id="ownerActions">
+      <button class="btn" id="btnBackup" type="button">Backup</button>
+      <button class="btn" id="btnSettings" type="button">FX &amp; date</button>
+      <button class="btn primary" id="btnAdd" type="button">Add asset</button>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div style="min-width:0">
+      <div class="total" id="total">₱0.00</div>
+      <div class="subline num" id="usdLine">—</div>
+      <div class="split">
+        <div><span class="eyebrow">Philippines</span><b id="phTot">₱0</b><span class="pct" id="phPct">0%</span></div>
+        <div><span class="eyebrow">Global</span><b id="glTot">₱0</b><span class="pct" id="glPct">0%</span></div>
+      </div>
+      <div class="bar" id="regionBar"></div>
+    </div>
+    <div class="chart">
+      <svg class="donut" viewBox="0 0 120 120" id="donut" role="img" aria-label="Allocation by asset type"></svg>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <section id="sec-PH"></section>
+  <section id="sec-GLOBAL"></section>
+
+  <div class="note">
+    <span id="status">Loading holdings…</span>
+    <span class="num" id="fxNote"></span>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <form id="assetForm" novalidate>
+    <h3 id="formTitle">Add asset</h3>
+    <div class="two">
+      <label>Category
+        <select id="f-region"><option value="PH">Philippines</option><option value="GLOBAL">Global</option></select>
+      </label>
+      <label>Asset type
+        <input id="f-type" list="typeList" placeholder="Stock, ETF, Gold, MP2…" autocomplete="off">
+      </label>
+    </div>
+    <datalist id="typeList"></datalist>
+    <div class="two">
+      <label>Code / name
+        <input id="f-name" placeholder="ALI, VOO, Gold bar" autocomplete="off">
+      </label>
+      <label>Description
+        <input id="f-desc" placeholder="Optional" autocomplete="off">
+      </label>
+    </div>
+    <div class="two">
+      <label>Positions (shares / units)
+        <input id="f-qty" inputmode="decimal" placeholder="Leave blank for lump sum">
+      </label>
+      <label>Price currency
+        <select id="f-cur"><option value="PHP">PHP ₱</option><option value="USD">USD $</option></select>
+      </label>
+    </div>
+    <label><span id="priceLbl">Market price</span>
+      <input id="f-price" inputmode="decimal" placeholder="0.00">
+      <span class="hint" id="priceHint">Per unit. With no positions, enter the total amount instead.</span>
+    </label>
+    <div class="err" id="formErr" hidden></div>
+    <div class="formact">
+      <div><button class="btn danger" type="button" id="btnDelete" hidden>Delete</button></div>
+      <div class="actions">
+        <button class="btn" type="button" id="btnCancel">Cancel</button>
+        <button class="btn primary" type="submit" id="btnSave">Save</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgBk">
+  <form method="dialog" onsubmit="return false">
+    <h3>Backup &amp; restore</h3>
+    <p class="hint" style="margin:0">Your holdings are saved only in this browser. Download a backup to keep a copy or move to another device, then restore it there.</p>
+    <button class="btn primary" type="button" id="bkDownload">Download backup</button>
+    <label>Restore from backup file<input type="file" id="bkFile" accept=".json,application/json"></label>
+    <div class="hint" id="bkMsg"></div>
+    <div class="err" id="bkErr" hidden></div>
+    <div class="formact"><span></span><button class="btn" type="button" id="bkClose">Close</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlgSet">
+  <form id="setForm" novalidate>
+    <h3>FX &amp; date</h3>
+    <label>USD / PHP rate<input id="s-fx" inputmode="decimal"></label>
+    <label>As of<input id="s-date" type="date"></label>
+    <div class="err" id="setErr" hidden></div>
+    <div class="formact"><span></span><div class="actions">
+      <button class="btn" type="button" id="setCancel">Cancel</button>
+      <button class="btn primary" type="submit">Save</button></div></div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  const PALETTE=["#d9b25f","#5fb7a0","#7f9de0","#d9846b","#b38fd6","#8fbf5a","#e0a2c0","#6fc4d6","#c7c070","#9aa6a3"];
+  const KEY="sison-portfolio-v1"; let holdings=[], settings={fx:62.63,asOf:""}, canWrite=true, editingId=null, delArmed=false;
+  const $=id=>document.getElementById(id);
+  const php=n=>"₱"+n.toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
+  const phpShort=n=>"₱"+n.toLocaleString("en-PH",{maximumFractionDigits:0});
+  const usd=n=>"$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+  const qtyFmt=n=>n.toLocaleString("en-US",{maximumFractionDigits:4});
+  const priceFmt=(n,c)=>(c==="USD"?"$":"₱")+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4});
+  const fx=()=>Number(settings.fx)||0;
+  function valuePHP(h){
+    const base=(h.qty!=null&&h.qty!=="")?Number(h.qty)*Number(h.price):Number(h.price);
+    return (base||0)*(h.currency==="USD"?fx():1);
+  }
+  const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  function typeColors(types){
+    const map={}; types.forEach((t,i)=>map[t]=PALETTE[i%PALETTE.length]); return map;
+  }
+
+  function render(){
+    const total=holdings.reduce((s,h)=>s+valuePHP(h),0);
+    const ph=holdings.filter(h=>h.region!=="GLOBAL"), gl=holdings.filter(h=>h.region==="GLOBAL");
+    const phT=ph.reduce((s,h)=>s+valuePHP(h),0), glT=gl.reduce((s,h)=>s+valuePHP(h),0);
+    const pct=v=>total?Math.round(v/total*1000)/10:0;
+
+    $("total").textContent=php(total);
+    $("usdLine").textContent=fx()?`${usd(total/fx())} in USD · ${holdings.length} positions`:`${holdings.length} positions`;
+    $("asof").textContent=settings.asOf?new Date(settings.asOf+"T00:00:00").toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"}):"Date not set";
+    $("phTot").textContent=phpShort(phT); $("glTot").textContent=phpShort(glT);
+    $("phPct").textContent=pct(phT)+"%"; $("glPct").textContent=pct(glT)+"%";
+    $("regionBar").innerHTML=total?`<span style="width:${phT/total*100}%;background:var(--brass)"></span><span style="width:${glT/total*100}%;background:var(--jade)"></span>`:"";
+    $("fxNote").textContent=fx()?`USD/PHP ${fx().toFixed(2)}`:"";
+
+    // allocation by asset type
+    const byType={};
+    holdings.forEach(h=>{const t=(h.type||"Other").trim()||"Other";byType[t]=(byType[t]||0)+valuePHP(h)});
+    const types=Object.keys(byType).sort((a,b)=>byType[b]-byType[a]);
+    const colors=typeColors(types);
+    const R=46,C=2*Math.PI*R; let off=0, arcs=`<circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--raise)" stroke-width="16"/>`;
+    types.forEach(t=>{const f=total?byType[t]/total:0; const len=f*C;
+      arcs+=`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${colors[t]}" stroke-width="16" stroke-dasharray="${Math.max(len-1,0)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"><title>${esc(t)} ${pct(byType[t])}%</title></circle>`; off+=len;});
+    arcs+=`<text x="60" y="57" text-anchor="middle" fill="var(--muted)" font-size="8" font-family="Instrument Sans,sans-serif" letter-spacing="1">TYPES</text><text x="60" y="71" text-anchor="middle" fill="var(--fg)" font-size="15" font-weight="600" font-family="IBM Plex Mono,monospace">${types.length}</text>`;
+    $("donut").innerHTML=arcs;
+    $("legend").innerHTML=types.map(t=>`<div><i style="background:${colors[t]}"></i><span>${esc(t)}</span><span class="num">${pct(byType[t])}%</span></div>`).join("")||`<div class="sub" style="display:block">No assets yet</div>`;
+
+    $("typeList").innerHTML=[...new Set(["Stock","ETF","Mutual fund","Gold","MP2","Bonds","Cash","Crypto","Real estate",...types])].map(t=>`<option value="${esc(t)}">`).join("");
+
+    renderSection("PH","Philippine assets",ph,phT,colors);
+    renderSection("GLOBAL","Global assets",gl,glT,colors);
+  }
+
+  function renderSection(key,title,list,sum,colors){
+    const tOf=h=>(h.type||"Other").trim()||"Other";
+    const groupTot={}; list.forEach(h=>{groupTot[tOf(h)]=(groupTot[tOf(h)]||0)+valuePHP(h)});
+    const sorted=[...list].sort((a,b)=>{
+      const ta=tOf(a), tb=tOf(b);
+      if(ta!==tb) return (groupTot[tb]-groupTot[ta])||ta.localeCompare(tb);
+      return valuePHP(b)-valuePHP(a);
+    });
+    let lastType=null;
+    const rows=sorted.map(h=>{
+      const t0=tOf(h);
+      const head=t0!==lastType?`<div class="grp"><span><i style="background:${colors[t0]}"></i>${esc(t0)}</span><span class="num">${php(groupTot[t0])}</span></div>`:"";
+      lastType=t0;
+      return head+rowHtml(h);
+    }).join("");
+    function rowHtml(h){
+      const lump=h.qty==null||h.qty==="";
+      const t=(h.type||"Other").trim()||"Other";
+      return `<div class="row${canWrite?" editable":""}" data-id="${esc(h.id)}" ${canWrite?'tabindex="0" role="button"':""}>
+        <div class="who"><div class="nm">${esc(h.name)}${h.desc?` <span class="sub">${esc(h.desc)}</span>`:""}</div>
+          <span class="chip" style="border-color:${colors[t]};color:${colors[t]}">${esc(t)}</span></div>
+        <div class="c" data-l="Positions">${lump?"—":qtyFmt(Number(h.qty))}</div>
+        <div class="c" data-l="Market price">${lump?"—":priceFmt(Number(h.price),h.currency)}</div>
+        <div class="c tv" data-l="Total value">${php(valuePHP(h))}${h.currency==="USD"?`<div class="sub">${usd(lump?Number(h.price):Number(h.qty)*Number(h.price))}</div>`:""}</div>
+      </div>`}
+    $("sec-"+key).innerHTML=`<div class="sechead"><h2>${title}</h2><span class="count">${list.length} position${list.length===1?"":"s"}</span></div>
+      <div class="thead"><span>Asset</span><span>Positions</span><span>Market price</span><span>Total value</span></div>
+      ${rows||`<div class="empty">No ${key==="PH"?"Philippine":"global"} assets yet.${canWrite?" Use Add asset to record one.":""}</div>`}
+      <div class="foot"><span>${title} total</span><span class="num">${php(sum)}</span></div>`;
+  }
+
+  document.addEventListener("click",e=>{const r=e.target.closest(".row.editable"); if(r) openForm(r.dataset.id)});
+  document.addEventListener("keydown",e=>{if(e.key==="Enter"){const r=e.target.closest&&e.target.closest(".row.editable"); if(r) openForm(r.dataset.id)}});
+
+  function updatePriceLabel(){
+    const lump=$("f-qty").value.trim()==="";
+    $("priceLbl").textContent=lump?"Total amount":"Market price";
+  }
+  $("f-qty").addEventListener("input",updatePriceLabel);
+
+  function openForm(id){
+    editingId=id||null; delArmed=false;
+    const h=id?holdings.find(x=>x.id===id):{region:"PH",currency:"PHP"};
+    $("formTitle").textContent=id?"Edit asset":"Add asset";
+    $("f-region").value=h.region||"PH"; $("f-type").value=h.type||""; $("f-name").value=h.name||"";
+    $("f-desc").value=h.desc||""; $("f-qty").value=h.qty??""; $("f-cur").value=h.currency||"PHP"; $("f-price").value=h.price??"";
+    $("btnDelete").hidden=!id; $("btnDelete").textContent="Delete"; $("formErr").hidden=true;
+    updatePriceLabel(); $("dlg").showModal();
+  }
+  $("btnAdd").onclick=()=>openForm(null);
+  $("btnCancel").onclick=()=>$("dlg").close();
+  $("f-region").onchange=()=>{ if(!editingId) $("f-cur").value=$("f-region").value==="GLOBAL"?"USD":"PHP"; };
+
+  const showErr=(el,msg)=>{el.textContent=msg;el.hidden=false};
+  $("assetForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const name=$("f-name").value.trim(), qtyS=$("f-qty").value.replace(/,/g,"").trim(), priceS=$("f-price").value.replace(/,/g,"").trim();
+    if(!name) return showErr($("formErr"),"Enter a code or name.");
+    const price=Number(priceS); if(priceS===""||!isFinite(price)||price<0) return showErr($("formErr"),"Enter a valid price or amount.");
+    let qty=null; if(qtyS!==""){qty=Number(qtyS); if(!isFinite(qty)||qty<0) return showErr($("formErr"),"Positions must be a number.");}
+    const doc={region:$("f-region").value,type:$("f-type").value.trim()||"Other",name,desc:$("f-desc").value.trim(),qty,price,currency:$("f-cur").value};
+    $("btnSave").disabled=true;
+    try{
+      if(editingId){holdings=holdings.map(h=>h.id===editingId?{id:editingId,...doc}:h)}else{holdings.push({id:newId(),...doc})}
+      save(); $("dlg").close();
+    }catch(err){showErr($("formErr"),"Couldn't save: "+(err&&err.message||"try again."))}
+    finally{$("btnSave").disabled=false}
+  });
+  $("btnDelete").onclick=async()=>{
+    if(!delArmed){delArmed=true;$("btnDelete").textContent="Tap again to delete";return}
+    try{holdings=holdings.filter(h=>h.id!==editingId);save();$("dlg").close()}
+    catch(err){showErr($("formErr"),"Couldn't delete: "+(err&&err.message||"try again."))}
+  };
+
+  $("btnSettings").onclick=()=>{$("s-fx").value=settings.fx??"";$("s-date").value=settings.asOf||"";$("setErr").hidden=true;$("dlgSet").showModal()};
+  $("setCancel").onclick=()=>$("dlgSet").close();
+  $("setForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const f=Number($("s-fx").value); if(!isFinite(f)||f<=0) return showErr($("setErr"),"Enter a rate above zero.");
+    try{settings={fx:f,asOf:$("s-date").value};save();$("dlgSet").close()}
+    catch(err){showErr($("setErr"),"Couldn't save: "+(err&&err.message||"try again."))}
+  });
+
+  render();
+
+  // ---- Local storage: data lives only in this browser, never in the repo ----
+  function newId(){return "a"+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify({holdings,settings,savedAt:new Date().toISOString()}))}
+    catch(e){$("status").textContent="Couldn't save in this browser. Use Backup to keep a copy."}
+    render(); setStatus();
+  }
+  function setStatus(){
+    $("status").textContent=holdings.length?"Saved in this browser only. Use Backup after big changes.":"No data yet. Restore your backup file or add your first asset.";
+  }
+  function load(){
+    try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); holdings=d.holdings||[]; settings={...settings,...(d.settings||{})}}}
+    catch(e){}
+  }
+  function applyBackup(text){
+    const d=JSON.parse(text);
+    if(!d||!Array.isArray(d.holdings)) throw new Error("That file isn't a portfolio backup.");
+    holdings=d.holdings.map(h=>({id:h.id||newId(),...h})); settings={...settings,...(d.settings||{})}; save();
+  }
+  $("btnBackup").onclick=()=>{$("bkErr").hidden=true;$("bkMsg").textContent="";$("dlgBk").showModal()};
+  $("bkClose").onclick=()=>$("dlgBk").close();
+  $("bkDownload").onclick=()=>{
+    const blob=new Blob([JSON.stringify({holdings,settings,savedAt:new Date().toISOString()},null,2)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="portfolio-backup-"+new Date().toISOString().slice(0,10)+".json"; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000); $("bkMsg").textContent="Backup downloaded.";
+  };
+  $("bkFile").onchange=async e=>{
+    const f=e.target.files[0]; if(!f) return;
+    try{applyBackup(await f.text()); $("bkMsg").textContent=`Restored ${holdings.length} assets.`; $("bkErr").hidden=true}
+    catch(err){showErr($("bkErr"),err.message||"Couldn't read that file.")}
+    e.target.value="";
+  };
+  load(); render(); setStatus();
+  // Ask the browser not to evict saved data (helps on iOS), and enable offline use.
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+  if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+})();
+</script>
+
+</body>
+</html>
