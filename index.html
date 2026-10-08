@@ -4,49 +4,53 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#0f1517">
+<meta name="theme-color" content="#faf8f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1a17" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Portfolio">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Sison Family Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
-/* Layout: one ledger column — summary + allocation donut on top, then Philippines and Global holdings blocks. Dark-first. */
+/* Layout: one ledger column — summary + allocation donut on top, then Philippines and Global holdings. Colors follow the family logo: forest green, gold, cream. */
 :root{
-  --bg:#0f1517; --surface:#161e21; --raise:#1d272b; --line:#2a373c;
-  --fg:#e8ece9; --muted:#8c9a97; --brass:#d9b25f; --jade:#5fb7a0; --neg:#e57c6b;
-  --display:"Fraunces",Georgia,serif; --body:"Instrument Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-  color-scheme:dark;
+  --bg:#faf8f2; --surface:#ffffff; --raise:#f1eee5; --line:#e2dccd;
+  --fg:#10302b; --muted:#6b7570; --green:#0d5248; --leaf:#3f8f4a; --gold:#b8862f; --on-green:#fdfbf5;
+  --brass:var(--gold); --jade:var(--green); --neg:#b4432f;
+  --display:"Montserrat",system-ui,sans-serif; --body:"Instrument Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
 }
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
-  --bg:#f5f3ee; --surface:#fffdf9; --raise:#efece5; --line:#ddd8cd;
-  --fg:#1b2422; --muted:#66706d; --brass:#9a7426; --jade:#2c7d68; --neg:#b4432f; color-scheme:light}}
-:root[data-theme="light"]{
-  --bg:#f5f3ee; --surface:#fffdf9; --raise:#efece5; --line:#ddd8cd;
-  --fg:#1b2422; --muted:#66706d; --brass:#9a7426; --jade:#2c7d68; --neg:#b4432f; color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1a17; --surface:#11241f; --raise:#173029; --line:#244039;
+  --fg:#eef1ea; --muted:#93a39c; --green:#4fae8c; --leaf:#7cc06a; --gold:#d9ad55; --on-green:#0b1a17; --neg:#e58472; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1a17; --surface:#11241f; --raise:#173029; --line:#244039;
+  --fg:#eef1ea; --muted:#93a39c; --green:#4fae8c; --leaf:#7cc06a; --gold:#d9ad55; --on-green:#0b1a17; --neg:#e58472; color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45}
 .wrap{max-width:960px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) 16px calc(48px + env(safe-area-inset-bottom,0px))}
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
 .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.eyebrow.title{font-size:17px;letter-spacing:.12em;color:var(--fg)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:52px;height:52px;border-radius:14px;background:#fffdf9;border:1px solid var(--line);flex:none}
+.eyebrow.title{font-family:var(--display);font-size:18px;font-weight:800;letter-spacing:.1em;color:var(--green)}
 .asof{color:var(--muted);font-size:15px;margin-top:2px}
 .btn{font:inherit;font-weight:600;font-size:14px;border-radius:999px;padding:9px 16px;border:1px solid var(--line);background:var(--raise);color:var(--fg);cursor:pointer}
-.btn:hover{border-color:var(--brass)}
-.btn.primary{background:var(--brass);color:#1a1405;border-color:var(--brass)}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:var(--green);color:var(--on-green);border-color:var(--green)}
 .btn.danger{color:var(--neg)}
 .btn:focus-visible,input:focus-visible,select:focus-visible,.row:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 
 .summary{margin-top:22px;padding-bottom:24px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center}
 @media (max-width:640px){.summary{grid-template-columns:1fr}}
-.total{font-family:var(--mono);font-weight:600;font-size:clamp(34px,8vw,56px);letter-spacing:-.03em;line-height:1.05;margin:6px 0 8px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.total{font-family:var(--display);font-weight:800;color:var(--fg);font-size:clamp(34px,8vw,56px);letter-spacing:-.03em;line-height:1.05;margin:6px 0 8px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .subline{color:var(--muted);font-size:14px}
 .split{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .split div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
@@ -63,8 +67,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-
 .legend .num{color:var(--muted)}
 
 section{margin-top:34px}
-.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:2px solid var(--brass);padding-bottom:8px}
-h2{font-family:var(--display);font-weight:600;font-size:26px;margin:0;color:var(--brass)}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:2px solid var(--gold);padding-bottom:8px}
+h2{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.01em;margin:0;color:var(--green)}
 .count{color:var(--muted);font-size:13px}
 .thead,.row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.2fr);gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line)}
 .thead{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;padding-block:10px}
@@ -77,7 +81,8 @@ h2{font-family:var(--display);font-weight:600;font-size:26px;margin:0;color:var(
 .row.editable{cursor:pointer}
 .row.editable:hover{background:var(--surface)}
 .nm{font-weight:600;overflow-wrap:anywhere}
-.chip{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.04em;padding:1px 8px;border-radius:99px;margin-top:3px;border:1px solid var(--line);color:var(--muted)}
+.chip i{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:6px;vertical-align:1px}
+.chip{display:inline-block;color:var(--fg)!important;font-size:11px;font-weight:600;letter-spacing:.04em;padding:1px 8px;border-radius:99px;margin-top:3px;border:1px solid var(--line);color:var(--muted)}
 .row .c{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;overflow-wrap:anywhere}
 .row .tv{font-weight:600}
 .sub{color:var(--muted);font-size:12px}
@@ -97,7 +102,7 @@ h2{font-family:var(--display);font-weight:600;font-size:26px;margin:0;color:var(
 dialog{background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:0;width:min(460px,calc(100vw - 32px))}
 dialog::backdrop{background:rgba(0,0,0,.55)}
 form{padding:20px;display:grid;gap:12px}
-form h3{font-family:var(--display);font-weight:600;font-size:22px;margin:0}
+form h3{font-family:var(--display);font-weight:700;font-size:20px;margin:0;color:var(--green)}
 label{display:grid;gap:4px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -111,9 +116,12 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
 
 <div class="wrap">
   <div class="top">
-    <div>
-      <div class="eyebrow title">Gross portfolio</div>
-      <div class="asof" id="asof">—</div>
+    <div class="brand">
+      <img src="logo.png" alt="Sison Family Portfolio logo">
+      <div>
+        <div class="eyebrow title">Gross portfolio</div>
+        <div class="asof" id="asof">—</div>
+      </div>
     </div>
     <div class="actions" id="ownerActions">
       <button class="btn" id="btnBackup" type="button">Backup</button>
@@ -216,7 +224,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
 
 <script>
 (function(){
-  const PALETTE=["#d9b25f","#5fb7a0","#7f9de0","#d9846b","#b38fd6","#8fbf5a","#e0a2c0","#6fc4d6","#c7c070","#9aa6a3"];
+  const PALETTE=["#0d5248","#c9963a","#4a9a52","#7b5a22","#3f8f9a","#e2bd6a","#1f7a63","#a3c46c","#8a6d3b","#6fa89a"];
   const KEY="sison-portfolio-v1"; let holdings=[], settings={fx:62.63,asOf:""}, canWrite=true, editingId=null, delArmed=false;
   const $=id=>document.getElementById(id);
   const php=n=>"₱"+n.toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -287,7 +295,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
       const t=(h.type||"Other").trim()||"Other";
       return `<div class="row${canWrite?" editable":""}" data-id="${esc(h.id)}" ${canWrite?'tabindex="0" role="button"':""}>
         <div class="who"><div class="nm">${esc(h.name)}${h.desc?` <span class="sub">${esc(h.desc)}</span>`:""}</div>
-          <span class="chip" style="border-color:${colors[t]};color:${colors[t]}">${esc(t)}</span></div>
+          <span class="chip" style="border-color:${colors[t]}"><i style="background:${colors[t]}"></i>${esc(t)}</span></div>
         <div class="c" data-l="Positions">${lump?"—":qtyFmt(Number(h.qty))}</div>
         <div class="c" data-l="Market price">${lump?"—":priceFmt(Number(h.price),h.currency)}</div>
         <div class="c tv" data-l="Total value">${php(valuePHP(h))}${h.currency==="USD"?`<div class="sub">${usd(lump?Number(h.price):Number(h.qty)*Number(h.price))}</div>`:""}</div>
