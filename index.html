@@ -808,6 +808,8 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   const dayKey=iso=>{const d=new Date(iso);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
   const dayLabel=k=>new Date(k+"T00:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"});
   const shortDay=k=>new Date(k+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  const longDay=k=>new Date(k+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+  const chartDay=k=>k.slice(2); // YY-MM-DD
   const tmLabel=iso=>new Date(iso).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
   const compact=n=>{const a=Math.abs(n);const trim=t=>t.includes(".")?t.replace(/\.?0+$/,""):t;return "₱"+(a>=1e6?trim((n/1e6).toFixed(a>=1e8?0:2))+"M":a>=1e3?(n/1e3).toFixed(0)+"K":n.toFixed(0))};
   function signed(n){ if(Math.abs(n)<0.005) return `<span class="flat">no change</span>`; return `<span class="${n>0?"up":"down"}">${n>0?"+":"−"}${phpShort(Math.abs(n))}</span>` }
@@ -847,8 +849,8 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     const cur=totals(holdings,settings).total;
     $("hTotal").textContent=php(cur);
     if(pts.length>1){const first=pts[0].v,d=cur-first,pc=first?d/first*100:0;
-      $("hDelta").innerHTML=`${signed(d)} <span class="flat">(${pc>=0?"+":""}${pc.toFixed(2)}%) since ${shortDay(pts[0].k)}</span>`}
-    else $("hDelta").innerHTML=`<span class="flat">Tracking since ${pts.length?shortDay(pts[0].k):"today"}</span>`;
+      $("hDelta").innerHTML=`${signed(d)} <span class="flat">(${pc>=0?"+":""}${pc.toFixed(2)}%) since ${longDay(pts[0].k)}</span>`}
+    else $("hDelta").innerHTML=`<span class="flat">Tracking since ${longDay(pts.length?pts[0].k:today())}</span>`;
     $("hChart").innerHTML=lineChart(pts);
     // timeline grouped by day, newest first
     const byDay={}; hist.log.forEach(e=>{const k=dayKey(e.at);(byDay[k]=byDay[k]||[]).push(e)});
@@ -877,7 +879,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     const area=pts.length>1?`<path d="${line}L${x(pts[pts.length-1].k).toFixed(1)},${H-B}L${x(pts[0].k).toFixed(1)},${H-B}Z" fill="url(#nwg)"/>`:"";
     const last=pts[pts.length-1];
     const xl=[pts[0]]; if(pts.length>2) xl.push(pts[Math.floor((pts.length-1)/2)]); if(pts.length>1) xl.push(last);
-    const xlab=xl.map((p,i)=>`<text x="${x(p.k)}" y="${H-8}" text-anchor="${pts.length===1?"middle":i===0?"start":i===xl.length-1?"end":"middle"}" font-size="9.5" fill="var(--muted)" font-family="Instrument Sans,sans-serif">${shortDay(p.k)}</text>`).join("");
+    const xlab=xl.map((p,i)=>`<text x="${x(p.k)}" y="${H-8}" text-anchor="${pts.length===1?"middle":i===0?"start":i===xl.length-1?"end":"middle"}" font-size="9.5" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${chartDay(p.k)}</text>`).join("");
     return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Net worth by day, latest ${phpShort(last.v)}">
       <defs><linearGradient id="nwg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--green)" stop-opacity=".22"/><stop offset="1" stop-color="var(--green)" stop-opacity="0"/></linearGradient></defs>
       ${grid}${area}<path d="${line}" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
