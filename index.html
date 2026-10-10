@@ -116,6 +116,72 @@ h2{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.01e
 .empty{padding:22px 4px;color:var(--muted)}
 .note{margin-top:28px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
+/* menu + pages */
+.menubtn{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--green);cursor:pointer}
+.menubtn svg{width:20px;height:20px}
+.scrim{position:fixed;inset:0;background:rgba(6,20,17,.45);z-index:40;opacity:0;transition:opacity .2s}
+.scrim.show{opacity:1}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(290px,82vw);z-index:50;background:var(--surface);border-right:1px solid var(--line);
+  padding:calc(22px + env(safe-area-inset-top,0px)) 14px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;
+  transform:translateX(-104%);visibility:hidden;transition:transform .25s ease,visibility .25s}
+.drawer.open{transform:none;visibility:visible}
+.dhead{display:flex;align-items:center;gap:12px;padding:0 6px 18px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.dhead img{width:46px;height:46px;border-radius:12px;background:#fffdf9;border:1px solid var(--line)}
+.dhead b{display:block;font-family:var(--display);font-weight:800;color:var(--green);font-size:15px;letter-spacing:.02em}
+.dhead span{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.nav{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:10px;border:0;background:none;color:var(--fg);font:inherit;font-weight:600;font-size:15px;text-align:left;cursor:pointer}
+.nav svg{width:20px;height:20px;color:var(--muted);flex:none}
+.nav:hover{background:var(--raise)}
+.nav[aria-current="page"]{background:var(--raise);color:var(--green)}
+.nav[aria-current="page"] svg{color:var(--gold)}
+.nav .soon{margin-left:auto;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:99px;padding:1px 7px}
+.dfoot{margin-top:auto;font-size:12px;color:var(--muted);padding:0 6px}
+.phead{display:flex;align-items:center;gap:12px}
+.phead h1{font-family:var(--display);font-weight:800;font-size:22px;margin:0;color:var(--green);letter-spacing:.02em}
+.phead .sub{font-size:14px}
+/* history */
+.hsum{margin-top:22px;display:grid;gap:4px}
+.hsum .total{margin:0}
+.delta{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px}
+.up{color:var(--leaf)} .down{color:var(--neg)} .flat{color:var(--muted)}
+.lc{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 12px 8px}
+.lc svg{width:100%;height:auto;display:block}
+.lc .cap{font-size:12px;color:var(--muted);padding:2px 4px 6px}
+.day{margin-top:22px}
+.dayh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 4px;border-bottom:2px solid var(--gold)}
+.dayh b{font-family:var(--display);font-weight:700;color:var(--green);font-size:15px}
+.dayh .r{display:flex;align-items:center;gap:10px}
+.dayh .num{font-size:13px}
+.btn.sm{padding:5px 12px;font-size:13px}
+.ev{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:start;padding:11px 4px;border-bottom:1px solid var(--line)}
+.ev .tm{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px;min-width:58px}
+.ev .tx{min-width:0;overflow-wrap:anywhere}
+.ev .tx .what{font-weight:600}
+.ev .tx .det{font-size:13px;color:var(--muted);margin-top:2px}
+.ev .tx .det b{color:var(--fg);font-weight:500;font-family:var(--mono);font-size:12px}
+.ev .dv{font-family:var(--mono);font-size:12px;text-align:right;white-space:nowrap;padding-top:2px}
+.ev .act{grid-column:2/-1}
+.tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:1px 7px;border-radius:99px;margin-right:6px;vertical-align:1px;border:1px solid var(--line);color:var(--muted)}
+.tag.add{border-color:var(--leaf);color:var(--leaf)} .tag.edit{border-color:var(--gold);color:var(--gold)} .tag.del{border-color:var(--neg);color:var(--neg)} .tag.sys{border-color:var(--green);color:var(--green)}
+.more{margin-top:18px;display:flex;justify-content:center}
+/* snapshot dialog */
+#dlgSnap{width:min(560px,calc(100vw - 24px))}
+.sn-tot{font-family:var(--display);font-weight:800;font-size:28px;color:var(--fg)}
+.sn-split{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.sn-split b{font-family:var(--mono);color:var(--fg);font-weight:600}
+.sn-list{max-height:min(46vh,420px);overflow:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sn-reg{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding:10px 2px 4px}
+.sn-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:8px 2px;border-bottom:1px solid var(--line)}
+.sn-row:last-child{border-bottom:0}
+.sn-row .n{font-weight:600;overflow-wrap:anywhere} .sn-row .v{font-family:var(--mono);font-size:13px;text-align:right}
+.sn-row .m{grid-column:1/-1;font-size:12px;color:var(--muted);font-family:var(--mono)}
+.warn{font-size:13px;color:var(--neg)}
+/* coming soon */
+.soonbox{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:36px 22px;text-align:center;display:grid;gap:10px;justify-items:center}
+.soonbox img{width:84px;height:84px;border-radius:20px;background:#fffdf9;border:1px solid var(--line)}
+.soonbox h2{font-size:20px}
+.soonbox p{margin:0;color:var(--muted);max-width:42ch}
+
 dialog{background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:0;width:min(460px,calc(100vw - 32px))}
 dialog::backdrop{background:rgba(0,0,0,.55)}
 form{padding:20px;display:grid;gap:12px}
@@ -131,9 +197,19 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
 </head>
 <body>
 
-<div class="wrap">
+<div class="scrim" id="scrim" hidden></div>
+<nav class="drawer" id="drawer" aria-label="Main menu">
+  <div class="dhead"><img src="logo.png" alt=""><div><b>SISON FAMILY</b><span>Portfolio</span></div></div>
+  <button class="nav" type="button" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</button>
+  <button class="nav" type="button" data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/></svg>History</button>
+  <button class="nav" type="button" data-page="details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l4-5 3 3 5-6"/></svg>Investment details<span class="soon">Soon</span></button>
+  <div class="dfoot">Saved on this device<span id="dDrive"></span></div>
+</nav>
+
+<main class="wrap page" id="page-dashboard">
   <div class="top">
     <div class="brand">
+      <button class="menubtn" type="button" data-menu aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <img src="logo.png" alt="Sison Family Portfolio logo">
       <div>
         <div class="eyebrow title">Gross portfolio</div>
@@ -176,7 +252,48 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     <span id="status">Loading holdings…</span>
     <span class="num" id="fxNote"></span>
   </div>
-</div>
+</main>
+
+<main class="wrap page" id="page-history" hidden>
+  <div class="phead">
+    <button class="menubtn" type="button" data-menu aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div><h1>History</h1><div class="sub">Every change to your dashboard, newest first</div></div>
+  </div>
+  <div class="hsum">
+    <span class="eyebrow">Net worth over time</span>
+    <div class="total" id="hTotal">₱0.00</div>
+    <div class="delta" id="hDelta"></div>
+  </div>
+  <div class="lc" id="hChart"></div>
+  <div id="hDays"></div>
+  <div class="more"><button class="btn" type="button" id="hMore" hidden>Show older days</button></div>
+</main>
+
+<main class="wrap page" id="page-details" hidden>
+  <div class="phead">
+    <button class="menubtn" type="button" data-menu aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div><h1>Investment details</h1></div>
+  </div>
+  <div class="soonbox">
+    <img src="logo.png" alt="">
+    <h2>Coming soon</h2>
+    <p>This page will hold the details for each investment. It will be built once the requirements are ready.</p>
+  </div>
+</main>
+
+<dialog id="dlgSnap">
+  <form method="dialog" onsubmit="return false">
+    <h3 id="snTitle">Portfolio snapshot</h3>
+    <div class="sn-tot" id="snTotal"></div>
+    <div class="sn-split" id="snSplit"></div>
+    <div class="sn-list" id="snList"></div>
+    <div class="warn" id="snWarn" hidden>This replaces your current dashboard with this version. Your current version stays in History, so you can switch back.</div>
+    <div class="formact">
+      <button class="btn danger" type="button" id="snRestore">Restore this version</button>
+      <button class="btn" type="button" id="snClose">Close</button>
+    </div>
+  </form>
+</dialog>
 
 <dialog id="dlg">
   <form id="assetForm" novalidate>
@@ -243,7 +360,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
 <dialog id="dlgBk">
   <form method="dialog" onsubmit="return false">
     <h3>Backup &amp; restore</h3>
-    <p class="hint" style="margin:0">Your holdings are saved only in this browser. Download a backup to keep a copy or move to another device, then restore it there.</p>
+    <p class="hint" style="margin:0">Download a backup file as a second copy of your holdings and history. Restoring a file replaces your current holdings. Your history is kept and merged.</p>
     <button class="btn primary" type="button" id="bkDownload">Download backup</button>
     <label>Restore from backup file<input type="file" id="bkFile" accept=".json,application/json"></label>
     <div class="hint" id="bkMsg"></div>
@@ -399,14 +516,28 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     const doc={region:$("f-region").value,type:$("f-type").value.trim()||"Other",name,desc:$("f-desc").value.trim(),qty,price,currency:$("f-cur").value};
     $("btnSave").disabled=true;
     try{
-      if(editingId){holdings=holdings.map(h=>h.id===editingId?{id:editingId,...doc}:h)}else{holdings.push({id:newId(),...doc})}
-      stamp(); save(); $("dlg").close();
+      const before=totals(holdings,settings).total;
+      if(editingId){
+        const old=holdings.find(h=>h.id===editingId);
+        holdings=holdings.map(h=>h.id===editingId?{id:editingId,...doc}:h);
+        const ch=diffAsset(old,doc);
+        stamp();
+        if(ch.length) record({action:"edit",asset:assetRef({id:editingId,...doc}),changes:ch,before});
+        save();
+      }else{
+        const nh={id:newId(),...doc}; holdings.push(nh); stamp();
+        record({action:"add",asset:assetRef(nh),value:valuePHP(nh),before}); save();
+      }
+      $("dlg").close();
     }catch(err){showErr($("formErr"),"Couldn't save: "+(err&&err.message||"try again."))}
     finally{$("btnSave").disabled=false}
   });
   $("btnDelete").onclick=async()=>{
     if(!delArmed){delArmed=true;$("btnDelete").textContent="Tap again to delete";return}
-    try{holdings=holdings.filter(h=>h.id!==editingId);stamp();save();$("dlg").close()}
+    try{
+      const before=totals(holdings,settings).total, old=holdings.find(h=>h.id===editingId);
+      holdings=holdings.filter(h=>h.id!==editingId); stamp();
+      record({action:"delete",asset:assetRef(old),value:valuePHP(old),before}); save(); $("dlg").close()}
     catch(err){showErr($("formErr"),"Couldn't delete: "+(err&&err.message||"try again."))}
   };
 
@@ -415,7 +546,12 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   $("setForm").addEventListener("submit",async e=>{
     e.preventDefault();
     const f=Number($("s-fx").value); if(!isFinite(f)||f<=0) return showErr($("setErr"),"Enter a rate above zero.");
-    try{settings={fx:f,asOf:$("s-date").value};save();$("dlgSet").close()}
+    try{
+      const before=totals(holdings,settings).total, old={...settings};
+      settings={fx:f,asOf:$("s-date").value};
+      const ch=[]; if(Number(old.fx)!==f) ch.push({f:"fx",a:old.fx,b:f}); if((old.asOf||"")!==settings.asOf) ch.push({f:"asOf",a:old.asOf||"",b:settings.asOf});
+      if(ch.length) record({action:"settings",changes:ch,before});
+      save(); $("dlgSet").close()}
     catch(err){showErr($("setErr"),"Couldn't save: "+(err&&err.message||"try again."))}
   });
 
@@ -431,8 +567,10 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     catch(e){$("status").textContent="Couldn't save in this browser. Use Backup to keep a copy."}
   }
   function save(){
+    snapshotToday(); persistHist();
     localSavedAt=new Date().toISOString(); persistLocal();
     render(); setStatus(); queuePush();
+    if(curPage==="history") renderHistory();
   }
   function setStatus(){
     $("status").textContent=holdings.length?(drive.connected?"Saved on this device and synced to your Google Drive.":"Saved in this browser only. Connect Google Drive or use Backup after big changes."):"No data yet. Connect Google Drive, restore a backup file, or add your first asset.";
@@ -444,12 +582,15 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   function applyBackup(text){
     const d=JSON.parse(text);
     if(!d||!Array.isArray(d.holdings)) throw new Error("That file isn't a portfolio backup.");
-    holdings=d.holdings.map(h=>({id:h.id||newId(),...h})); settings={...settings,...(d.settings||{})}; save();
+    const before=totals(holdings,settings).total, prev=snapOf();
+    holdings=d.holdings.map(h=>({id:h.id||newId(),...h})); settings={...settings,...(d.settings||{})};
+    if(d.history) hist=mergeHist(hist,d.history);
+    record({action:"restore-backup",count:holdings.length,before,prev}); save();
   }
   $("btnBackup").onclick=()=>{$("bkErr").hidden=true;$("bkMsg").textContent="";$("dlgBk").showModal()};
   $("bkClose").onclick=()=>$("dlgBk").close();
   $("bkDownload").onclick=()=>{
-    const blob=new Blob([JSON.stringify({holdings,settings,savedAt:new Date().toISOString()},null,2)],{type:"application/json"});
+    const blob=new Blob([JSON.stringify({holdings,settings,history:hist,savedAt:new Date().toISOString()},null,2)],{type:"application/json"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
     a.download="portfolio-backup-"+new Date().toISOString().slice(0,10)+".json"; a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),1000); $("bkMsg").textContent="Backup downloaded.";
@@ -460,6 +601,46 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     catch(err){showErr($("bkErr"),err.message||"Couldn't read that file.")}
     e.target.value="";
   };
+  // ---- History: append-only change log + one snapshot per day ----
+  const HKEY="sison-portfolio-history";
+  let hist={log:[],snaps:{}};
+  try{const h=JSON.parse(localStorage.getItem(HKEY)); if(h&&Array.isArray(h.log)) hist={log:h.log,snaps:h.snaps||{}}}catch(e){}
+  function persistHist(){
+    try{localStorage.setItem(HKEY,JSON.stringify(hist))}
+    catch(e){$("status").textContent="History is too large for this device's storage. Download a backup, then tell Summer to trim old snapshots."}
+  }
+  const clone=o=>JSON.parse(JSON.stringify(o));
+  function totals(hs,st){
+    const f=Number(st&&st.fx)||0, v=h=>{const b=(h.qty!=null&&h.qty!=="")?Number(h.qty)*Number(h.price):Number(h.price);return (b||0)*(h.currency==="USD"?f:1)};
+    let ph=0,gl=0; (hs||[]).forEach(h=>{h.region==="GLOBAL"?gl+=v(h):ph+=v(h)}); return {total:ph+gl,ph,gl};
+  }
+  const snapOf=()=>({holdings:clone(holdings),settings:clone(settings)});
+  function snapshotToday(){
+    const t=totals(holdings,settings);
+    hist.snaps[today()]={at:new Date().toISOString(),...snapOf(),...t,count:holdings.length};
+  }
+  const assetRef=h=>h?{name:h.name,type:h.type,region:h.region,desc:h.desc||""}:{name:"(unknown)"};
+  function diffAsset(a,b){
+    const out=[]; ["name","type","region","desc","qty","price","currency"].forEach(k=>{
+      const x=a?a[k]:undefined, y=b[k]; const nx=(x===""||x==null)?null:x, ny=(y===""||y==null)?null:y;
+      if(String(nx)!==String(ny)) out.push({f:k,a:nx,b:ny,cur:b.currency||"PHP",curA:a?a.currency:"PHP"});
+    }); return out;
+  }
+  function record(e){
+    e.id="h"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    e.at=new Date().toISOString(); e.after=totals(holdings,settings).total;
+    hist.log.push(e);
+  }
+  function mergeHist(a,b){
+    a=a||{log:[],snaps:{}}; b=b||{log:[],snaps:{}};
+    const byId=new Map(); [...(a.log||[]),...(b.log||[])].forEach(e=>{if(e&&e.id&&!byId.has(e.id)) byId.set(e.id,e)});
+    const log=[...byId.values()].sort((x,y)=>String(x.at).localeCompare(String(y.at)));
+    const snaps={...(a.snaps||{})};
+    Object.entries(b.snaps||{}).forEach(([d,sn])=>{ if(!snaps[d]||String(sn.at)>String(snaps[d].at)) snaps[d]=sn });
+    return {log,snaps};
+  }
+  const histSig=h=>h?((h.log||[]).map(e=>e.id).join(",")+"|"+Object.entries(h.snaps||{}).map(([d,x])=>d+x.at).sort().join(",")):"";
+
   // ---- Google Drive sync (drive.file scope: the app can only see the file it creates) ----
   const DRIVE_FILE="Sison Family Portfolio data.json";
   const SCOPE="https://www.googleapis.com/auth/drive.file";
@@ -531,7 +712,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     const j=await (await api(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&orderBy=modifiedTime%20desc&fields=files(id)`)).json();
     drive.fileId=j.files&&j.files[0]?j.files[0].id:null; saveDrive(); return drive.fileId;
   }
-  const payload=()=>({app:"sison-portfolio",version:1,holdings,settings,savedAt:localSavedAt||new Date().toISOString()});
+  const payload=()=>({app:"sison-portfolio",version:2,holdings,settings,history:hist,savedAt:localSavedAt||new Date().toISOString()});
   async function writeRemote(){
     const p=payload(), body=JSON.stringify(p);
     if(drive.fileId){
@@ -546,6 +727,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   }
   function applyRemote(d){
     holdings=(d.holdings||[]).map(h=>({id:h.id||newId(),...h})); settings={...settings,...(d.settings||{})};
+    hist=mergeHist(hist,d.history); persistHist(); if(curPage==="history") renderHistory();
     localSavedAt=d.savedAt||new Date().toISOString(); persistLocal(); render(); markSynced(localSavedAt);
   }
   function markSynced(at){drive.lastSync=at; drive.lastSyncAt=new Date().toISOString(); saveDrive(); conflictRemote=null; setDrive("ok"); setStatus()}
@@ -565,8 +747,11 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
       const remoteChanged=!!rAt&&rAt!==base;
       const localChanged=!!lAt&&lAt!==base&&holdings.length>0;
       if(remoteChanged&&localChanged){conflictRemote=remote; showConflict(); return}
-      if(remoteChanged) applyRemote(remote);
-      else await writeRemote();
+      if(remoteChanged){
+        applyRemote(remote);
+        // this device had history entries Drive didn't: push the merged history back
+        if(histSig(hist)!==histSig(remote.history)){localSavedAt=new Date().toISOString(); persistLocal(); await writeRemote()}
+      }else{ hist=mergeHist(hist,remote.history); persistHist(); await writeRemote() }
     }catch(e){ e.auth?setDrive("auth"):setDrive("err",e.message) }
     finally{syncing=false}
   }
@@ -576,8 +761,13 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     $("keepLocal").textContent=`Keep this device's copy: ${holdings.length} assets, saved ${fmtTime(localSavedAt)}`;
     setDrive("conflict"); if(!$("dlgDrive").open) $("dlgDrive").showModal(); paintDialog();
   }
-  $("keepDrive").onclick=()=>{if(conflictRemote) applyRemote(conflictRemote)};
+  $("keepDrive").onclick=async()=>{ if(!conflictRemote) return;
+    const before=totals(holdings,settings).total, prev=snapOf(), r=conflictRemote;
+    applyRemote(r); record({action:"keep-drive",before,prev}); snapshotToday(); persistHist();
+    localSavedAt=new Date().toISOString(); persistLocal(); render();
+    if(tokenOk()){ try{await writeRemote()}catch(e){e.auth?setDrive("auth"):setDrive("err",e.message)} } };
   $("keepLocal").onclick=async()=>{ if(!tokenOk()){connect();return}
+    if(conflictRemote){ hist=mergeHist(hist,conflictRemote.history); record({action:"keep-local",before:totals(holdings,settings).total}); persistHist(); localSavedAt=new Date().toISOString(); persistLocal() }
     setDrive("busy"); try{await writeRemote()}catch(e){e.auth?setDrive("auth"):setDrive("err",e.message)} };
   function queuePush(){
     if(!drive.connected) return;
@@ -595,7 +785,140 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     drive={}; saveDrive(); setDrive("off"); setStatus(); paintDialog();
   };
 
+  // ---- Pages + side menu ----
+  const PKEY="sison-portfolio-page"; let curPage="dashboard";
+  function openMenu(){ $("scrim").hidden=false; requestAnimationFrame(()=>{$("scrim").classList.add("show");$("drawer").classList.add("open")}); const c=$("drawer").querySelector('[aria-current="page"]'); c&&c.focus() }
+  function closeMenu(){ $("scrim").classList.remove("show"); $("drawer").classList.remove("open"); setTimeout(()=>{ if(!$("drawer").classList.contains("open")) $("scrim").hidden=true },250) }
+  function showPage(name){
+    if(!["dashboard","history","details"].includes(name)) name="dashboard";
+    curPage=name;
+    ["dashboard","history","details"].forEach(n=>$("page-"+n).hidden=n!==name);
+    document.querySelectorAll(".nav").forEach(b=>b.dataset.page===name?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+    try{localStorage.setItem(PKEY,name)}catch(e){}
+    if(name==="history") renderHistory();
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll("[data-menu]").forEach(b=>b.onclick=openMenu);
+  $("scrim").onclick=closeMenu;
+  document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>{showPage(b.dataset.page);closeMenu()});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("drawer").classList.contains("open")) closeMenu()});
+
+  // ---- History page ----
+  const LABEL={name:"Name",type:"Type",region:"Category",desc:"Description",qty:"Positions",price:"Price",currency:"Currency",fx:"USD/PHP rate",asOf:"Date"};
+  const dayKey=iso=>{const d=new Date(iso);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+  const dayLabel=k=>new Date(k+"T00:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+  const shortDay=k=>new Date(k+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  const tmLabel=iso=>new Date(iso).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+  const compact=n=>{const a=Math.abs(n);const trim=t=>t.includes(".")?t.replace(/\.?0+$/,""):t;return "₱"+(a>=1e6?trim((n/1e6).toFixed(a>=1e8?0:2))+"M":a>=1e3?(n/1e3).toFixed(0)+"K":n.toFixed(0))};
+  function signed(n){ if(Math.abs(n)<0.005) return `<span class="flat">no change</span>`; return `<span class="${n>0?"up":"down"}">${n>0?"+":"−"}${phpShort(Math.abs(n))}</span>` }
+  function fmtVal(c,which){
+    const v=which==="a"?c.a:c.b; if(v==null||v==="") return "blank";
+    if(c.f==="price") return priceFmt(Number(v),which==="a"?(c.curA||c.cur):c.cur);
+    if(c.f==="qty") return qtyFmt(Number(v));
+    if(c.f==="region") return v==="GLOBAL"?"Global":"Philippines";
+    if(c.f==="asOf") return new Date(v+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+    return esc(v);
+  }
+  function evHtml(e){
+    const a=e.asset||{}, where=a.region==="GLOBAL"?"Global":"Philippines";
+    let tag="",what="",det="";
+    switch(e.action){
+      case "add": tag='<span class="tag add">Added</span>'; what=esc(a.name); det=`${esc(a.type||"")} · ${where} · ${phpShort(e.value||0)}`; break;
+      case "edit": tag='<span class="tag edit">Edited</span>'; what=esc(a.name);
+        det=(e.changes||[]).map(c=>`${LABEL[c.f]||c.f} <b>${fmtVal(c,"a")}</b> → <b>${fmtVal(c,"b")}</b>`).join("<br>"); break;
+      case "delete": tag='<span class="tag del">Deleted</span>'; what=esc(a.name); det=`${esc(a.type||"")} · ${where} · was ${phpShort(e.value||0)}`; break;
+      case "settings": tag='<span class="tag edit">Settings</span>'; what="FX & date";
+        det=(e.changes||[]).map(c=>`${LABEL[c.f]||c.f} <b>${fmtVal(c,"a")}</b> → <b>${fmtVal(c,"b")}</b>`).join("<br>"); break;
+      case "restore-backup": tag='<span class="tag sys">Restored</span>'; what="From a backup file"; det=`${e.count||0} assets loaded`; break;
+      case "restore-version": tag='<span class="tag sys">Restored</span>'; what=`Version from ${e.from?shortDay(e.from):"an earlier day"}`; det=`${e.count||0} assets`; break;
+      case "keep-drive": tag='<span class="tag sys">Sync</span>'; what="Kept the Google Drive copy"; det="Chosen when this device and Drive both had changes"; break;
+      case "keep-local": tag='<span class="tag sys">Sync</span>'; what="Kept this device's copy"; det="Chosen when this device and Drive both had changes"; break;
+      case "start": tag='<span class="tag sys">Start</span>'; what="History started"; det=`${e.count||0} assets on record`; break;
+      default: tag='<span class="tag">Change</span>'; what=esc(e.action);
+    }
+    const d=(e.after!=null&&e.before!=null)?e.after-e.before:null;
+    const prevBtn=e.prev?`<div class="act"><button class="btn sm" type="button" data-prev="${esc(e.id)}">View version before this</button></div>`:"";
+    return `<div class="ev"><span class="tm">${tmLabel(e.at)}</span><div class="tx"><div class="what">${tag}${what}</div><div class="det">${det}</div></div><span class="dv">${d==null?"":signed(d)}</span>${prevBtn}</div>`;
+  }
+  let dayLimit=14;
+  function renderHistory(){
+    const days=Object.keys(hist.snaps).sort();
+    const pts=days.map(k=>({k,v:hist.snaps[k].total}));
+    const cur=totals(holdings,settings).total;
+    $("hTotal").textContent=php(cur);
+    if(pts.length>1){const first=pts[0].v,d=cur-first,pc=first?d/first*100:0;
+      $("hDelta").innerHTML=`${signed(d)} <span class="flat">(${pc>=0?"+":""}${pc.toFixed(2)}%) since ${shortDay(pts[0].k)}</span>`}
+    else $("hDelta").innerHTML=`<span class="flat">Tracking since ${pts.length?shortDay(pts[0].k):"today"}</span>`;
+    $("hChart").innerHTML=lineChart(pts);
+    // timeline grouped by day, newest first
+    const byDay={}; hist.log.forEach(e=>{const k=dayKey(e.at);(byDay[k]=byDay[k]||[]).push(e)});
+    Object.keys(hist.snaps).forEach(k=>{byDay[k]=byDay[k]||[]});
+    const keys=Object.keys(byDay).sort().reverse();
+    $("hDays").innerHTML=keys.slice(0,dayLimit).map(k=>{
+      const sn=hist.snaps[k], evs=byDay[k].slice().reverse();
+      return `<div class="day"><div class="dayh"><b>${dayLabel(k)}</b><span class="r">${sn?`<span class="num">${phpShort(sn.total)}</span><button class="btn sm" type="button" data-snap="${k}">View</button>`:""}</span></div>
+        ${evs.map(evHtml).join("")||`<div class="empty" style="padding:12px 4px">No changes logged this day.</div>`}</div>`}).join("")
+      ||`<div class="empty">No history yet. Changes you make on the dashboard will appear here.</div>`;
+    $("hMore").hidden=keys.length<=dayLimit;
+  }
+  $("hMore").onclick=()=>{dayLimit+=14;renderHistory()};
+  function lineChart(pts){
+    if(!pts.length) return `<div class="cap">Your net worth chart starts with today's snapshot.</div>`;
+    const W=340,H=170,L=50,R=14,T=14,B=26;
+    let lo=Math.min(...pts.map(p=>p.v)), hi=Math.max(...pts.map(p=>p.v));
+    if(hi-lo<Math.max(hi*0.002,1)){const pad=Math.max(hi*0.02,1000);lo-=pad;hi+=pad}
+    const span=hi-lo; lo-=span*0.12; hi+=span*0.12;
+    const t0=new Date(pts[0].k).getTime(), t1=new Date(pts[pts.length-1].k).getTime();
+    const x=k=>pts.length===1?L+(W-L-R)/2:L+(new Date(k).getTime()-t0)/(t1-t0)*(W-L-R);
+    const y=v=>T+(hi-v)/(hi-lo)*(H-T-B);
+    const ticks=[0,1,2,3].map(i=>lo+(hi-lo)*i/3);
+    const grid=ticks.map(v=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+3.5}" text-anchor="end" font-size="9.5" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${compact(v)}</text>`).join("");
+    const line=pts.map((p,i)=>`${i?"L":"M"}${x(p.k).toFixed(1)},${y(p.v).toFixed(1)}`).join("");
+    const area=pts.length>1?`<path d="${line}L${x(pts[pts.length-1].k).toFixed(1)},${H-B}L${x(pts[0].k).toFixed(1)},${H-B}Z" fill="url(#nwg)"/>`:"";
+    const last=pts[pts.length-1];
+    const xl=[pts[0]]; if(pts.length>2) xl.push(pts[Math.floor((pts.length-1)/2)]); if(pts.length>1) xl.push(last);
+    const xlab=xl.map((p,i)=>`<text x="${x(p.k)}" y="${H-8}" text-anchor="${pts.length===1?"middle":i===0?"start":i===xl.length-1?"end":"middle"}" font-size="9.5" fill="var(--muted)" font-family="Instrument Sans,sans-serif">${shortDay(p.k)}</text>`).join("");
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Net worth by day, latest ${phpShort(last.v)}">
+      <defs><linearGradient id="nwg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--green)" stop-opacity=".22"/><stop offset="1" stop-color="var(--green)" stop-opacity="0"/></linearGradient></defs>
+      ${grid}${area}<path d="${line}" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${pts.length>1&&pts.length<=40?pts.slice(0,-1).map(p=>`<circle cx="${x(p.k)}" cy="${y(p.v)}" r="2.2" fill="var(--green)"/>`).join(""):""}
+      <circle cx="${x(last.k)}" cy="${y(last.v)}" r="4.5" fill="var(--gold)" stroke="var(--surface)" stroke-width="2"/>${xlab}</svg>
+      <div class="cap">${pts.length===1?"One point so far. The line grows each day you update your dashboard.":`Closing value on each day you made changes · ${pts.length} days`}</div>`;
+  }
+
+  // ---- Snapshot viewer + restore ----
+  let snapView=null, restoreArmed=false;
+  function openSnap(view){
+    snapView=view; restoreArmed=false;
+    const t=totals(view.holdings,view.settings);
+    $("snTitle").textContent=view.title;
+    $("snTotal").textContent=php(t.total);
+    $("snSplit").innerHTML=`<span>Philippines <b>${phpShort(t.ph)}</b></span><span>Global <b>${phpShort(t.gl)}</b></span><span>USD/PHP <b>${Number(view.settings.fx||0).toFixed(2)}</b></span><span><b>${view.holdings.length}</b> assets</span>`;
+    const f=Number(view.settings.fx)||0, val=h=>{const b=(h.qty!=null&&h.qty!=="")?Number(h.qty)*Number(h.price):Number(h.price);return (b||0)*(h.currency==="USD"?f:1)};
+    const grp=r=>view.holdings.filter(h=>(h.region==="GLOBAL")===(r==="GLOBAL")).sort((a,b)=>val(b)-val(a));
+    $("snList").innerHTML=["PH","GLOBAL"].map(r=>{const l=grp(r); if(!l.length) return "";
+      return `<div class="sn-reg">${r==="GLOBAL"?"Global":"Philippines"}</div>`+l.map(h=>{const lump=h.qty==null||h.qty==="";
+        return `<div class="sn-row"><span class="n">${esc(h.name)} <span class="sub">${esc(h.type||"")}</span></span><span class="v">${php(val(h))}</span>${lump?"":`<span class="m">${qtyFmt(Number(h.qty))} × ${priceFmt(Number(h.price),h.currency)}</span>`}</div>`}).join("")}).join("")||`<div class="empty">No assets in this version.</div>`;
+    $("snWarn").hidden=true; $("snRestore").textContent="Restore this version"; $("dlgSnap").showModal();
+  }
+  $("hDays").addEventListener("click",e=>{
+    const s1=e.target.closest("[data-snap]"); if(s1){const k=s1.dataset.snap, sn=hist.snaps[k]; if(sn) openSnap({title:`Portfolio at end of ${dayLabel(k)}`,holdings:sn.holdings,settings:sn.settings,from:k}); return}
+    const p1=e.target.closest("[data-prev]"); if(p1){const ev=hist.log.find(x=>x.id===p1.dataset.prev); if(ev&&ev.prev) openSnap({title:`Version before ${tmLabel(ev.at)}, ${shortDay(dayKey(ev.at))}`,holdings:ev.prev.holdings,settings:ev.prev.settings,from:dayKey(ev.at)})}
+  });
+  $("snClose").onclick=()=>$("dlgSnap").close();
+  $("snRestore").onclick=()=>{
+    if(!snapView) return;
+    if(!restoreArmed){restoreArmed=true;$("snWarn").hidden=false;$("snRestore").textContent="Tap again to restore";return}
+    const before=totals(holdings,settings).total, prev=snapOf();
+    holdings=clone(snapView.holdings); settings={...clone(snapView.settings),asOf:today()};
+    record({action:"restore-version",from:snapView.from,count:holdings.length,before,prev}); save();
+    $("dlgSnap").close(); renderHistory();
+  };
+
   load();
+  if(!hist.log.length&&holdings.length){ record({action:"start",count:holdings.length,before:null}); hist.log[0].before=null; snapshotToday(); persistHist() }
+  else if(holdings.length&&!hist.snaps[today()]&&!Object.keys(hist.snaps).length){ snapshotToday(); persistHist() }
+  try{showPage(localStorage.getItem(PKEY)||"dashboard")}catch(e){showPage("dashboard")}
   const cameBack=handleRedirect();
   render(); setStatus();
   if(drive.connected){ tokenOk()?sync():setDrive("auth") } else if(!cameBack) setDrive("off");
