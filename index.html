@@ -14,6 +14,7 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Sison Family Portfolio</title>
+<script src="config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -105,6 +106,13 @@ h2{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.01e
 .tb .track{grid-column:1/-1;height:10px;border-radius:99px;background:var(--raise);overflow:hidden;display:flex}
 .tb .track span{height:100%}
 .tb .meta{grid-column:1/-1;display:flex;white-space:nowrap;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.drv{display:inline-flex;align-items:center;gap:7px}
+.drv i{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.drv[data-s="ok"] i{background:var(--leaf)}
+.drv[data-s="busy"] i{background:var(--gold)}
+.drv[data-s="auth"] i,.drv[data-s="err"] i,.drv[data-s="conflict"] i{background:var(--neg)}
+.choice{display:grid;gap:8px}
+.choice .btn{text-align:left;border-radius:10px;white-space:normal}
 .empty{padding:22px 4px;color:var(--muted)}
 .note{margin-top:28px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
@@ -133,6 +141,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
       </div>
     </div>
     <div class="actions" id="ownerActions">
+      <button class="btn drv" id="btnDrive" type="button"><i id="drvDot"></i><span id="drvLbl">Drive</span></button>
       <button class="btn" id="btnBackup" type="button">Backup</button>
       <button class="btn" id="btnSettings" type="button">FX &amp; date</button>
       <button class="btn primary" id="btnAdd" type="button">Add asset</button>
@@ -207,6 +216,25 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
       <div class="actions">
         <button class="btn" type="button" id="btnCancel">Cancel</button>
         <button class="btn primary" type="submit" id="btnSave">Save</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgDrive">
+  <form method="dialog" onsubmit="return false">
+    <h3>Google Drive sync</h3>
+    <p class="hint" style="margin:0" id="drvText"></p>
+    <div id="drvConflict" hidden>
+      <p class="hint" style="margin:0 0 8px">This device and Google Drive both changed since the last sync. Choose which copy to keep. The other copy will be replaced.</p>
+      <div class="choice"><button class="btn" type="button" id="keepDrive"></button><button class="btn" type="button" id="keepLocal"></button></div>
+    </div>
+    <div class="err" id="drvErr" hidden></div>
+    <div class="formact">
+      <button class="btn danger" type="button" id="drvDisconnect">Disconnect</button>
+      <div class="actions">
+        <button class="btn" type="button" id="drvClose">Close</button>
+        <button class="btn primary" type="button" id="drvSync">Sync now</button>
       </div>
     </div>
   </form>
@@ -397,16 +425,20 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   function newId(){return "a"+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
   function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
   function stamp(){settings={...settings,asOf:today()}}
-  function save(){
-    try{localStorage.setItem(KEY,JSON.stringify({holdings,settings,savedAt:new Date().toISOString()}))}
+  let localSavedAt="";
+  function persistLocal(){
+    try{localStorage.setItem(KEY,JSON.stringify({holdings,settings,savedAt:localSavedAt}))}
     catch(e){$("status").textContent="Couldn't save in this browser. Use Backup to keep a copy."}
-    render(); setStatus();
+  }
+  function save(){
+    localSavedAt=new Date().toISOString(); persistLocal();
+    render(); setStatus(); queuePush();
   }
   function setStatus(){
-    $("status").textContent=holdings.length?"Saved in this browser only. Use Backup after big changes.":"No data yet. Restore your backup file or add your first asset.";
+    $("status").textContent=holdings.length?(drive.connected?"Saved on this device and synced to your Google Drive.":"Saved in this browser only. Connect Google Drive or use Backup after big changes."):"No data yet. Connect Google Drive, restore a backup file, or add your first asset.";
   }
   function load(){
-    try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); holdings=d.holdings||[]; settings={...settings,...(d.settings||{})}}}
+    try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); holdings=d.holdings||[]; settings={...settings,...(d.settings||{})}; localSavedAt=d.savedAt||""}}
     catch(e){}
   }
   function applyBackup(text){
@@ -428,7 +460,145 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     catch(err){showErr($("bkErr"),err.message||"Couldn't read that file.")}
     e.target.value="";
   };
-  load(); render(); setStatus();
+  // ---- Google Drive sync (drive.file scope: the app can only see the file it creates) ----
+  const DRIVE_FILE="Sison Family Portfolio data.json";
+  const SCOPE="https://www.googleapis.com/auth/drive.file";
+  const DKEY="sison-portfolio-drive";
+  let drive=(()=>{try{return JSON.parse(localStorage.getItem(DKEY))||{}}catch(e){return {}}})();
+  let pending=null, conflictRemote=null, driveState="off", driveMsg="";
+  const saveDrive=()=>{try{localStorage.setItem(DKEY,JSON.stringify(drive))}catch(e){}};
+  const clientId=()=>String(window.GOOGLE_CLIENT_ID||"").trim();
+  const redirectUri=()=>location.origin+location.pathname;
+  const tokenOk=()=>!!drive.token&&drive.exp>Date.now()+60000;
+  const fmtTime=iso=>{if(!iso)return "never";const d=new Date(iso);return d.toLocaleDateString("en-US",{month:"short",day:"numeric"})+" "+d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})};
+
+  function setDrive(state,msg){
+    driveState=state; driveMsg=msg||"";
+    const b=$("btnDrive"); b.dataset.s=state;
+    $("drvLbl").textContent={off:"Connect Drive",ok:"Synced",busy:"Syncing…",auth:"Tap to sync",err:"Sync failed",conflict:"Choose copy"}[state]||"Drive";
+    if(!$("dlgDrive").open) return; paintDialog();
+  }
+  function paintDialog(){
+    const t={
+      off:"Not connected. Connect to keep your holdings in a file in your Google Drive and load them on any device.",
+      ok:`Connected. Last synced ${fmtTime(drive.lastSyncAt)}. Every change you make saves to Drive automatically.`,
+      busy:"Syncing with Google Drive…",
+      auth:"Google sign-in has expired (it lasts about an hour). Tap Sync now to sign in again and sync.",
+      err:"The last sync didn't go through. Check your connection and tap Sync now.",
+      conflict:"Both copies changed. Pick which one to keep below."
+    }[driveState];
+    $("drvText").textContent=t;
+    $("drvErr").hidden=!driveMsg||driveState!=="err"; $("drvErr").textContent=driveMsg;
+    $("drvConflict").hidden=driveState!=="conflict";
+    $("drvDisconnect").hidden=!drive.connected;
+    $("drvSync").textContent=drive.connected?"Sync now":"Connect Google Drive";
+  }
+
+  function connect(){
+    if(!clientId()){setDrive("err","Google sign-in isn't set up yet: the client ID is missing from config.js.");return}
+    const st=Math.random().toString(36).slice(2)+Date.now().toString(36);
+    drive.state=st; saveDrive();
+    const q=new URLSearchParams({client_id:clientId(),redirect_uri:redirectUri(),response_type:"token",scope:SCOPE,state:st,include_granted_scopes:"true"});
+    if(drive.email) q.set("login_hint",drive.email);
+    location.href="https://accounts.google.com/o/oauth2/v2/auth?"+q.toString();
+  }
+  function handleRedirect(){
+    if(!location.hash||location.hash.length<2) return false;
+    const h=new URLSearchParams(location.hash.slice(1));
+    if(!h.get("access_token")&&!h.get("error")) return false;
+    history.replaceState(null,"",redirectUri());
+    if(h.get("error")){setDrive(drive.connected?"auth":"off");return true}
+    if(h.get("state")!==drive.state){setDrive("err","Sign-in response didn't match. Please try again.");return true}
+    drive.token=h.get("access_token"); drive.exp=Date.now()+Number(h.get("expires_in")||3600)*1000;
+    drive.connected=true; delete drive.state; saveDrive();
+    return true;
+  }
+
+  async function api(url,opts={}){
+    let r;
+    try{r=await fetch(url,{...opts,headers:{Authorization:"Bearer "+drive.token,...(opts.headers||{})}})}
+    catch(e){throw new Error("Can't reach Google Drive. Check your internet connection.")}
+    if(r.status===401){drive.token=null;saveDrive();const e=new Error("auth");e.auth=true;throw e}
+    if(!r.ok){let m="";try{m=(await r.json()).error.message}catch(e){} throw new Error("Google Drive said: "+(m||r.status))}
+    return r;
+  }
+  async function findFile(){
+    if(drive.fileId){
+      try{const j=await (await api(`https://www.googleapis.com/drive/v3/files/${drive.fileId}?fields=id,trashed`)).json(); if(!j.trashed) return drive.fileId}
+      catch(e){if(e.auth) throw e}
+    }
+    const q=encodeURIComponent(`name='${DRIVE_FILE}' and trashed=false`);
+    const j=await (await api(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&orderBy=modifiedTime%20desc&fields=files(id)`)).json();
+    drive.fileId=j.files&&j.files[0]?j.files[0].id:null; saveDrive(); return drive.fileId;
+  }
+  const payload=()=>({app:"sison-portfolio",version:1,holdings,settings,savedAt:localSavedAt||new Date().toISOString()});
+  async function writeRemote(){
+    const p=payload(), body=JSON.stringify(p);
+    if(drive.fileId){
+      await api(`https://www.googleapis.com/upload/drive/v3/files/${drive.fileId}?uploadType=media`,{method:"PATCH",headers:{"Content-Type":"application/json"},body});
+    }else{
+      const b="sfp"+Date.now().toString(36);
+      const mp=`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({name:DRIVE_FILE,mimeType:"application/json"})}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`;
+      const j=await (await api("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",{method:"POST",headers:{"Content-Type":`multipart/related; boundary=${b}`},body:mp})).json();
+      drive.fileId=j.id;
+    }
+    localSavedAt=p.savedAt; persistLocal(); markSynced(p.savedAt);
+  }
+  function applyRemote(d){
+    holdings=(d.holdings||[]).map(h=>({id:h.id||newId(),...h})); settings={...settings,...(d.settings||{})};
+    localSavedAt=d.savedAt||new Date().toISOString(); persistLocal(); render(); markSynced(localSavedAt);
+  }
+  function markSynced(at){drive.lastSync=at; drive.lastSyncAt=new Date().toISOString(); saveDrive(); conflictRemote=null; setDrive("ok"); setStatus()}
+
+  let syncing=false;
+  async function sync(){
+    if(!drive.connected){setDrive("off");return}
+    if(!tokenOk()){setDrive("auth");return}
+    if(syncing){pending=pending||setTimeout(()=>{pending=null;sync()},800);return}
+    syncing=true; setDrive("busy");
+    try{
+      const id=await findFile();
+      if(!id){await writeRemote();return}
+      const remote=await (await api(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`)).json();
+      const rAt=remote.savedAt||"", lAt=localSavedAt||"", base=drive.lastSync||"";
+      if(rAt&&rAt===lAt){markSynced(lAt);return}
+      const remoteChanged=!!rAt&&rAt!==base;
+      const localChanged=!!lAt&&lAt!==base&&holdings.length>0;
+      if(remoteChanged&&localChanged){conflictRemote=remote; showConflict(); return}
+      if(remoteChanged) applyRemote(remote);
+      else await writeRemote();
+    }catch(e){ e.auth?setDrive("auth"):setDrive("err",e.message) }
+    finally{syncing=false}
+  }
+  function showConflict(){
+    const r=conflictRemote;
+    $("keepDrive").textContent=`Keep the Google Drive copy: ${(r.holdings||[]).length} assets, saved ${fmtTime(r.savedAt)}`;
+    $("keepLocal").textContent=`Keep this device's copy: ${holdings.length} assets, saved ${fmtTime(localSavedAt)}`;
+    setDrive("conflict"); if(!$("dlgDrive").open) $("dlgDrive").showModal(); paintDialog();
+  }
+  $("keepDrive").onclick=()=>{if(conflictRemote) applyRemote(conflictRemote)};
+  $("keepLocal").onclick=async()=>{ if(!tokenOk()){connect();return}
+    setDrive("busy"); try{await writeRemote()}catch(e){e.auth?setDrive("auth"):setDrive("err",e.message)} };
+  function queuePush(){
+    if(!drive.connected) return;
+    clearTimeout(pending); pending=setTimeout(()=>{pending=null; tokenOk()?sync():setDrive("auth")},1200);
+  }
+
+  $("btnDrive").onclick=()=>{
+    if(drive.connected&&driveState==="auth"){connect();return}
+    paintDialog(); $("dlgDrive").showModal();
+  };
+  $("drvSync").onclick=()=>{ if(!drive.connected||!tokenOk()){connect();return} sync() };
+  $("drvClose").onclick=()=>$("dlgDrive").close();
+  $("drvDisconnect").onclick=()=>{
+    const t=drive.token; if(t){fetch("https://oauth2.googleapis.com/revoke?token="+encodeURIComponent(t),{method:"POST"}).catch(()=>{})}
+    drive={}; saveDrive(); setDrive("off"); setStatus(); paintDialog();
+  };
+
+  load();
+  const cameBack=handleRedirect();
+  render(); setStatus();
+  if(drive.connected){ tokenOk()?sync():setDrive("auth") } else if(!cameBack) setDrive("off");
   // Ask the browser not to evict saved data (helps on iOS), and enable offline use.
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
