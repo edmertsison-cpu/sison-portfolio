@@ -15,6 +15,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Sison Family Portfolio</title>
 <script src="config.js"></script>
+<script>try{if((JSON.parse(localStorage.getItem("sison-portfolio-lock")||"{}")).enabled)document.documentElement.classList.add("locked")}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -182,6 +183,21 @@ h2{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.01e
 .soonbox h2{font-size:20px}
 .soonbox p{margin:0;color:var(--muted);max-width:42ch}
 
+/* app lock */
+#lockscreen{position:fixed;inset:0;z-index:100;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 16px;text-align:center}
+html.locked #lockscreen,html.covered #lockscreen{display:flex}
+html.locked .page,html.covered .page,html.locked .drawer,html.covered .drawer{visibility:hidden}
+html.covered:not(.locked) #lockBtn,html.covered:not(.locked) #lockHelp{display:none}
+#lockscreen img{width:96px;height:96px;border-radius:22px;background:#fffdf9;border:1px solid var(--line)}
+#lockscreen h2{font-size:22px}
+#lockscreen p{margin:0;color:var(--muted);max-width:34ch}
+#lockBtn{display:inline-flex;align-items:center;gap:10px;padding:12px 20px;font-size:15px}
+#lockBtn svg{width:20px;height:20px}
+#lockReset{margin-top:6px;font-size:13px}
+.linkbtn{background:none;border:0;color:var(--muted);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:4px}
+.nav .state{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted)}
+.nav .state.on{color:var(--leaf)}
+
 dialog{background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:0;width:min(460px,calc(100vw - 32px))}
 dialog::backdrop{background:rgba(0,0,0,.55)}
 form{padding:20px;display:grid;gap:12px}
@@ -197,12 +213,24 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
 </head>
 <body>
 
+<div id="lockscreen" role="dialog" aria-modal="true" aria-label="App locked">
+  <img src="logo.png" alt="">
+  <h2>Sison Family Portfolio</h2>
+  <p id="lockMsg">Locked. Unlock with Face ID, fingerprint, or your phone passcode.</p>
+  <button class="btn primary" type="button" id="lockBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11v3a8 8 0 0 1-2 5"/><path d="M8 11a4 4 0 0 1 8 0v1a12 12 0 0 1-1 5"/><path d="M5 12a7 7 0 0 1 14 0v1"/><path d="M6.5 6.5A8.5 8.5 0 0 1 12 4.5"/></svg><span>Unlock</span></button>
+  <div class="err" id="lockErr" hidden></div>
+  <div id="lockHelp"><button class="linkbtn" type="button" id="lockForgot">Can't unlock?</button>
+    <div id="lockReset" hidden><p style="margin:0 auto 8px">Resetting removes the lock <b>and erases this phone's copy</b> of your portfolio. If you use Google Drive sync, connect again afterwards to get everything back.</p>
+      <button class="btn danger" type="button" id="lockResetBtn">Erase this phone's copy and reset</button></div></div>
+</div>
+
 <div class="scrim" id="scrim" hidden></div>
 <nav class="drawer" id="drawer" aria-label="Main menu">
   <div class="dhead"><img src="logo.png" alt=""><div><b>SISON FAMILY</b><span>Portfolio</span></div></div>
   <button class="nav" type="button" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</button>
   <button class="nav" type="button" data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/></svg>History</button>
   <button class="nav" type="button" data-page="details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l4-5 3 3 5-6"/></svg>Investment details<span class="soon">Soon</span></button>
+  <button class="nav" type="button" id="navLock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>App lock<span class="state" id="lockState">Off</span></button>
   <div class="dfoot">Saved on this device<span id="dDrive"></span></div>
 </nav>
 
@@ -354,6 +382,15 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
         <button class="btn primary" type="button" id="drvSync">Sync now</button>
       </div>
     </div>
+  </form>
+</dialog>
+
+<dialog id="dlgLock">
+  <form method="dialog" onsubmit="return false">
+    <h3>App lock</h3>
+    <p class="hint" style="margin:0" id="lkText"></p>
+    <div class="err" id="lkErr" hidden></div>
+    <div class="formact"><button class="btn" type="button" id="lkClose">Close</button><button class="btn primary" type="button" id="lkToggle">Turn on</button></div>
   </form>
 </dialog>
 
@@ -950,6 +987,74 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     record({action:"restore-version",from:snapView.from,count:holdings.length,before,prev}); save();
     $("dlgSnap").close(); renderHistory();
   };
+
+  // ---- App lock: the phone's own Face ID / fingerprint / passcode via a device passkey (WebAuthn) ----
+  const LKEY="sison-portfolio-lock", GRACE=60*1000;
+  let lock=(()=>{try{return JSON.parse(localStorage.getItem(LKEY))||{}}catch(e){return {}}})();
+  const saveLock=()=>{try{localStorage.setItem(LKEY,JSON.stringify(lock))}catch(e){}};
+  const rnd=n=>crypto.getRandomValues(new Uint8Array(n));
+  const b64u=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  const unb64u=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");s+="=".repeat((4-s.length%4)%4);return Uint8Array.from(atob(s),c=>c.charCodeAt(0))};
+  let unlocking=false, hiddenAt=0, lockResetArmed=false;
+  async function lockAvailable(){
+    try{return !!(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch(e){return false}
+  }
+  function paintLockNav(){ const on=!!lock.enabled; $("lockState").textContent=on?"On":"Off"; $("lockState").classList.toggle("on",on) }
+  function showLocked(){ document.documentElement.classList.add("locked"); $("lockErr").hidden=true; $("lockReset").hidden=true; lockResetArmed=false; $("lockResetBtn").textContent="Erase this phone's copy and reset" }
+  async function verify(){
+    const a=await navigator.credentials.get({publicKey:{challenge:rnd(32),rpId:location.hostname,timeout:60000,userVerification:"required",
+      allowCredentials:[{type:"public-key",id:unb64u(lock.credId),transports:["internal","hybrid"]}]}});
+    if(!a) throw new Error("cancelled");
+    const flags=new Uint8Array(a.response.authenticatorData)[32];
+    if(!(flags&0x04)) throw new Error("Your phone didn't confirm it was you. Try again.");
+    return true;
+  }
+  async function unlock(auto){
+    if(unlocking) return; unlocking=true;
+    try{ await verify(); document.documentElement.classList.remove("locked","covered") }
+    catch(e){ if(auto&&e.name==="NotAllowedError") return; // some phones need a tap first: wait for the Unlock button
+      $("lockErr").textContent=e.name==="NotAllowedError"?"Unlock was cancelled or timed out. Tap Unlock to try again.":(e.message||"Couldn't unlock. Try again."); $("lockErr").hidden=false }
+    finally{ unlocking=false }
+  }
+  $("lockBtn").onclick=()=>unlock(false);
+  $("lockForgot").onclick=()=>{$("lockReset").hidden=!$("lockReset").hidden};
+  $("lockResetBtn").onclick=()=>{
+    if(!lockResetArmed){lockResetArmed=true;$("lockResetBtn").textContent="Tap again to erase and reset";return}
+    try{[KEY,HKEY,LKEY,"sison-portfolio-drive"].forEach(k=>localStorage.removeItem(k))}catch(e){}
+    location.replace(redirectUri());
+  };
+  async function openLockDialog(){
+    const ok=await lockAvailable(); $("lkErr").hidden=true;
+    if(!ok){ $("lkText").textContent="This phone or browser doesn't offer Face ID, fingerprint, or passcode checks to web apps. Make sure a screen lock is set up on the phone and open the app from its home-screen icon."; $("lkToggle").hidden=true }
+    else if(lock.enabled){ $("lkText").textContent="On. The app asks for Face ID, fingerprint, or your phone passcode when you open it, and again when you come back after more than a minute away. The lock applies to this phone only."; $("lkToggle").hidden=false; $("lkToggle").textContent="Turn off"; $("lkToggle").className="btn danger" }
+    else { $("lkText").textContent="Ask for Face ID, fingerprint, or your phone passcode every time the app opens, and when you return after more than a minute away. Your phone will save a passkey named \"Sison Family Portfolio\" to do this. Each phone sets its own lock."; $("lkToggle").hidden=false; $("lkToggle").textContent="Turn on"; $("lkToggle").className="btn primary" }
+    closeMenu(); $("dlgLock").showModal();
+  }
+  $("navLock").onclick=openLockDialog;
+  $("lkClose").onclick=()=>$("dlgLock").close();
+  $("lkToggle").onclick=async()=>{
+    $("lkErr").hidden=true;
+    try{
+      if(lock.enabled){ await verify(); lock={}; saveLock(); }
+      else{
+        const c=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:"Sison Family Portfolio",id:location.hostname},
+          user:{id:rnd(16),name:"Sison Family Portfolio",displayName:"Sison Family Portfolio app lock"},
+          pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],timeout:60000,attestation:"none",
+          authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required",residentKey:"preferred"}}});
+        lock={enabled:true,credId:b64u(c.rawId),since:new Date().toISOString()}; saveLock();
+      }
+      paintLockNav(); openLockDialog();
+    }catch(e){ $("lkErr").textContent=e.name==="NotAllowedError"?"Cancelled. Nothing was changed.":(e.message||"Something went wrong. Nothing was changed."); $("lkErr").hidden=false }
+  };
+  // Hide numbers whenever the app goes to the background; lock again after the grace period.
+  document.addEventListener("visibilitychange",()=>{
+    if(!lock.enabled) return;
+    if(document.hidden){ hiddenAt=Date.now(); document.documentElement.classList.add("covered") }
+    else if(Date.now()-hiddenAt>GRACE){ showLocked(); unlock(true) }
+    else document.documentElement.classList.remove("covered");
+  });
+  paintLockNav();
+  if(lock.enabled){ showLocked(); unlock(true) } else document.documentElement.classList.remove("locked");
 
   load();
   if(!hist.log.length&&holdings.length){ record({action:"start",count:holdings.length,before:null}); hist.log[0].before=null; snapshotToday(); persistHist() }

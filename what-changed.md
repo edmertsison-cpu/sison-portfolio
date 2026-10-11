@@ -8,6 +8,14 @@ Each version has a matching cache name in `sw.js` (`portfolio-vN`). After upload
 
 ---
 
+## v10 — 2026-10-11
+**App lock with Face ID / fingerprint**
+- New **App lock** item in the side menu. When it's on, the app asks for Face ID, fingerprint, or the phone passcode (whichever the phone has set up) when it opens, and again when you return after more than 1 minute away.
+- Uses a device passkey saved by the phone as "Sison Family Portfolio". Your face or fingerprint never leaves the phone, and the app never sees it.
+- Numbers are hidden as soon as the app goes to the background, so they don't show in the app switcher.
+- The lock is per phone, so each person sets it up on their own phone. Turning it off asks for Face ID or fingerprint first.
+- **Can't unlock?** erases this phone's copy and removes the lock. Data comes back by connecting Google Drive again.
+
 ## v9 — 2026-10-11
 **Always pull the latest data from Google Drive**
 - While the app is open, it checks Drive every 30 seconds. It also checks when you switch back to the app, when your phone reconnects to the internet, and when you tap the Drive button.
