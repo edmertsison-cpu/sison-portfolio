@@ -662,9 +662,9 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   function paintDialog(){
     const t={
       off:"Not connected. Connect to keep your holdings in a file in your Google Drive and load them on any device.",
-      ok:`Connected. Last synced ${fmtTime(drive.lastSyncAt)}. Every change you make saves to Drive automatically.`,
+      ok:`Connected. Last checked ${fmtTime(drive.lastSyncAt)}. Changes you make save to Drive right away, and the app checks Drive for newer data every 30 seconds while it's open and whenever you return to it.`,
       busy:"Syncing with Google Drive…",
-      auth:"Google sign-in has expired (it lasts about an hour). Tap Sync now to sign in again and sync.",
+      auth:"Google sign-in has expired (it lasts about an hour). The app renews it automatically when it can. If it couldn't, tap Sync now to sign in again.",
       err:"The last sync didn't go through. Check your connection and tap Sync now.",
       conflict:"Both copies changed. Pick which one to keep below."
     }[driveState];
@@ -675,11 +675,12 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     $("drvSync").textContent=drive.connected?"Sync now":"Connect Google Drive";
   }
 
-  function connect(){
+  function connect(silent){
     if(!clientId()){setDrive("err","Google sign-in isn't set up yet: the client ID is missing from config.js.");return}
     const st=Math.random().toString(36).slice(2)+Date.now().toString(36);
-    drive.state=st; saveDrive();
+    drive.state=st; if(silent) drive.autoTry=Date.now(); saveDrive();
     const q=new URLSearchParams({client_id:clientId(),redirect_uri:redirectUri(),response_type:"token",scope:SCOPE,state:st,include_granted_scopes:"true"});
+    if(silent) q.set("prompt","none"); // Google returns straight away: a fresh token, or an error if it needs you
     if(drive.email) q.set("login_hint",drive.email);
     location.href="https://accounts.google.com/o/oauth2/v2/auth?"+q.toString();
   }
@@ -705,23 +706,24 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   }
   async function findFile(){
     if(drive.fileId){
-      try{const j=await (await api(`https://www.googleapis.com/drive/v3/files/${drive.fileId}?fields=id,trashed`)).json(); if(!j.trashed) return drive.fileId}
+      try{const j=await (await api(`https://www.googleapis.com/drive/v3/files/${drive.fileId}?fields=id,trashed,version`)).json(); if(!j.trashed){remoteVer=j.version; return drive.fileId}}
       catch(e){if(e.auth) throw e}
     }
     const q=encodeURIComponent(`name='${DRIVE_FILE}' and trashed=false`);
-    const j=await (await api(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&orderBy=modifiedTime%20desc&fields=files(id)`)).json();
-    drive.fileId=j.files&&j.files[0]?j.files[0].id:null; saveDrive(); return drive.fileId;
+    const j=await (await api(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&orderBy=modifiedTime%20desc&fields=files(id,version)`)).json();
+    drive.fileId=j.files&&j.files[0]?j.files[0].id:null; remoteVer=j.files&&j.files[0]?j.files[0].version:null; saveDrive(); return drive.fileId;
   }
   const payload=()=>({app:"sison-portfolio",version:2,holdings,settings,history:hist,savedAt:localSavedAt||new Date().toISOString()});
   async function writeRemote(){
     const p=payload(), body=JSON.stringify(p);
     if(drive.fileId){
-      await api(`https://www.googleapis.com/upload/drive/v3/files/${drive.fileId}?uploadType=media`,{method:"PATCH",headers:{"Content-Type":"application/json"},body});
+      const j=await (await api(`https://www.googleapis.com/upload/drive/v3/files/${drive.fileId}?uploadType=media&fields=id,version`,{method:"PATCH",headers:{"Content-Type":"application/json"},body})).json();
+      remoteVer=j.version;
     }else{
       const b="sfp"+Date.now().toString(36);
       const mp=`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({name:DRIVE_FILE,mimeType:"application/json"})}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`;
-      const j=await (await api("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",{method:"POST",headers:{"Content-Type":`multipart/related; boundary=${b}`},body:mp})).json();
-      drive.fileId=j.id;
+      const j=await (await api("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,version",{method:"POST",headers:{"Content-Type":`multipart/related; boundary=${b}`},body:mp})).json();
+      drive.fileId=j.id; remoteVer=j.version;
     }
     localSavedAt=p.savedAt; persistLocal(); markSynced(p.savedAt);
   }
@@ -730,7 +732,8 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     hist=mergeHist(hist,d.history); persistHist(); if(curPage==="history") renderHistory();
     localSavedAt=d.savedAt||new Date().toISOString(); persistLocal(); render(); markSynced(localSavedAt);
   }
-  function markSynced(at){drive.lastSync=at; drive.lastSyncAt=new Date().toISOString(); saveDrive(); conflictRemote=null; setDrive("ok"); setStatus()}
+  let remoteVer=null;
+  function markSynced(at){drive.lastSync=at; if(remoteVer!=null) drive.ver=String(remoteVer); drive.lastSyncAt=new Date().toISOString(); saveDrive(); conflictRemote=null; setDrive("ok"); setStatus()}
 
   let syncing=false;
   async function sync(){
@@ -769,6 +772,36 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   $("keepLocal").onclick=async()=>{ if(!tokenOk()){connect();return}
     if(conflictRemote){ hist=mergeHist(hist,conflictRemote.history); record({action:"keep-local",before:totals(holdings,settings).total}); persistHist(); localSavedAt=new Date().toISOString(); persistLocal() }
     setDrive("busy"); try{await writeRemote()}catch(e){e.auth?setDrive("auth"):setDrive("err",e.message)} };
+  // ---- Keep this device current: cheap version check, full sync only when Drive changed ----
+  async function quickCheck(){
+    if(!drive.connected||syncing||conflictRemote) return;
+    if(!tokenOk()){ autoRenew(); return }
+    const localDirty=!!localSavedAt&&localSavedAt!==drive.lastSync;
+    if(!drive.fileId||!drive.ver||localDirty) return sync();
+    try{
+      const j=await (await api(`https://www.googleapis.com/drive/v3/files/${drive.fileId}?fields=version,trashed`)).json();
+      if(j.trashed){drive.fileId=null;saveDrive();return sync()}
+      if(String(j.version)!==drive.ver) return sync();
+      drive.lastSyncAt=new Date().toISOString(); saveDrive(); setDrive("ok");
+    }catch(e){
+      if(e.auth){autoRenew();return}
+      if(/404/.test(e.message)){drive.fileId=null;saveDrive();return sync()}
+      if(navigator.onLine!==false) setDrive("err",e.message);
+    }
+  }
+  // Sign-in lasts about an hour. Renew it silently (prompt=none) at most once every 10 minutes,
+  // and never while a form or dialog is open, so nothing you're typing is lost.
+  function autoRenew(){
+    if(!drive.connected||document.hidden) {setDrive("auth");return}
+    const busyUI=[...document.querySelectorAll("dialog")].some(d=>d.open);
+    if(busyUI||(drive.autoTry&&Date.now()-drive.autoTry<10*60*1000)){setDrive("auth");return}
+    connect(true);
+  }
+  setInterval(()=>{ if(!document.hidden&&navigator.onLine!==false) quickCheck() },30000);
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden) quickCheck() });
+  window.addEventListener("online",()=>quickCheck());
+  window.addEventListener("pageshow",e=>{ if(e.persisted) quickCheck() });
+
   function queuePush(){
     if(!drive.connected) return;
     clearTimeout(pending); pending=setTimeout(()=>{pending=null; tokenOk()?sync():setDrive("auth")},1200);
@@ -777,6 +810,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   $("btnDrive").onclick=()=>{
     if(drive.connected&&driveState==="auth"){connect();return}
     paintDialog(); $("dlgDrive").showModal();
+    if(drive.connected&&tokenOk()) quickCheck();
   };
   $("drvSync").onclick=()=>{ if(!drive.connected||!tokenOk()){connect();return} sync() };
   $("drvClose").onclick=()=>$("dlgDrive").close();
@@ -923,7 +957,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   try{showPage(localStorage.getItem(PKEY)||"dashboard")}catch(e){showPage("dashboard")}
   const cameBack=handleRedirect();
   render(); setStatus();
-  if(drive.connected){ tokenOk()?sync():setDrive("auth") } else if(!cameBack) setDrive("off");
+  if(drive.connected){ tokenOk()?sync():autoRenew() } else if(!cameBack) setDrive("off");
   // Ask the browser not to evict saved data (helps on iOS), and enable offline use.
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}

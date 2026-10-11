@@ -8,6 +8,13 @@ Each version has a matching cache name in `sw.js` (`portfolio-vN`). After upload
 
 ---
 
+## v9 — 2026-10-11
+**Always pull the latest data from Google Drive**
+- While the app is open, it checks Drive every 30 seconds. It also checks when you switch back to the app, when your phone reconnects to the internet, and when you tap the Drive button.
+- Each check is one tiny request that asks whether the Drive file changed. The full data downloads only when it did, so changes made on another device show up within about 30 seconds.
+- Sign-in renewal: Google sign-in lasts about an hour. When it expires, the app tries a silent renewal (no screens, about a second) at most once every 10 minutes, and never while a form or dialog is open. If Google needs you to confirm, the button shows "Tap to sync".
+- The Drive dialog now shows "Last checked" instead of "Last synced".
+
 ## v8 — 2026-10-10
 **History date formats**
 - "Tracking since" and "since" now include the year, for example *Tracking since Oct 10, 2026*.
