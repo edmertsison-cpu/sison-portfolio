@@ -116,6 +116,7 @@ Give the household one place to see the **total value of all family assets**, sp
     "asset": { "name", "type", "region", "desc" },          // add / edit / delete
     "card": { "name" },                                     // card-add / card-edit / card-delete
     "txn": { "add": 0, "sub": 0, "unit": "units | amount", "cur": "PHP | USD" }, // edit via Added / Sold
+    "note": "optional text, max 200",                       // edit via Add or Remove
     "changes": [ { "f": "price", "a": 15.38, "b": 16.00 } ], // edit / settings
     "value": 0,                                             // add / delete
     "before": 0, "after": 0,                                // portfolio total in PHP
@@ -173,6 +174,7 @@ Give the household one place to see the **total value of all family assets**, sp
 | FR-A8 | For assets with positions, the values are shares/units: new positions = current + added − sold. For lump-sum assets (no positions), they are amounts: new amount = current + deposited − withdrawn. The total value recomputes automatically. |
 | FR-A9 | A live preview shows current → new positions (or amount) and the new total value in PHP. Saving is blocked if the result would be below zero. |
 | FR-A10 | The History entry records the transaction (`txn: {add, sub, unit, cur}`) and shows it as *Added / Sold N units* or *Deposited / Withdrew ₱N*, plus the positions or amount change. |
+| FR-A11 | **Add or Remove** has an optional **Notes** field (max 200 characters, extra spaces collapsed). The note is stored on the History entry (`note`) and shown in quotes, escaped as plain text. A note with no other change is still logged as an edit entry. |
 
 ### 4.3 Navigation
 | ID | Requirement |

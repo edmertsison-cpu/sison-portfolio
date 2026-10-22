@@ -29,6 +29,8 @@ Each version has a matching cache name in `sw.js` (`portfolio-vN`). After upload
   - For assets without positions (cash, MP2, bonds), the values are amounts added to or subtracted from the total.
   - A live preview shows the new positions or amount and the new total value before you save. Selling or withdrawing more than you hold is blocked.
   - History records each one, e.g. *Added 50,000 units · Sold 20,000 units* or *Deposited ₱25,000 · Withdrew ₱5,000*.
+  - Optional **Notes** field (up to 200 characters), saved with the History entry and shown in quotes, e.g. *“October salary top-up”*. A note can also be saved on its own with no other change.
+- The hint under Market price / Total amount now matches the asset (per-unit price vs. total amount).
 - Titles and header buttons now use Title Case (e.g. *By Asset Type*, *Philippine Assets*, *Add Asset*, *FX & Date*). **SISON FAMILY PORTFOLIO** and **GROSS PORTFOLIO** stay all caps.
 
 ## v10 — 2026-10-11

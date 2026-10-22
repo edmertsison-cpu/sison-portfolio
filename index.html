@@ -183,6 +183,7 @@ h2{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.01e
 .txnprev{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;display:grid;gap:2px}
 .txnprev b{font-family:var(--mono);color:var(--fg);font-weight:600}
 .txnprev .bad{color:var(--neg)}
+.evnote{display:inline-block;margin-top:3px;font-style:italic;color:var(--fg);opacity:.85}
 /* credit cards */
 .ccsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
 @media (max-width:480px){.ccsum{grid-template-columns:1fr 1fr}.ccsum div:last-child{grid-column:1/-1}}
@@ -397,6 +398,9 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
         <label><span id="subLbl">Sold / Withdrawn</span><input id="f-sub" inputmode="decimal" placeholder="0"></label>
       </div>
       <div class="txnprev" id="txnPrev"></div>
+      <label><span>Notes <span class="hint" style="text-transform:none">(optional)</span></span>
+        <input id="f-note" maxlength="200" placeholder="e.g. Monthly top-up, sold to fund tuition" autocomplete="off">
+      </label>
     </fieldset>
     <div class="err" id="formErr" hidden></div>
     <div class="formact">
@@ -609,6 +613,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
   function updatePriceLabel(){
     const lump=$("f-qty").value.trim()==="";
     $("priceLbl").textContent=lump?"Total amount":"Market price";
+    $("priceHint").textContent=lump?"Leave Positions blank for cash and other assets without units.":"Price per share or unit. Leave Positions blank to enter a total amount instead.";
     $("addLbl").textContent=lump?"Added / Deposited (amount)":"Added / Deposited (shares / units)";
     $("subLbl").textContent=lump?"Sold / Withdrawn (amount)":"Sold / Withdrawn (shares / units)";
     updateTxnPreview();
@@ -633,7 +638,7 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
     $("f-region").value=h.region||"PH"; $("f-type").value=h.type||""; $("f-name").value=h.name||"";
     $("f-desc").value=h.desc||""; $("f-qty").value=h.qty??""; $("f-cur").value=h.currency||"PHP"; $("f-price").value=h.price??"";
     $("btnDelete").hidden=!id; $("btnDelete").textContent="Delete"; $("formErr").hidden=true;
-    $("txnBox").hidden=!id; $("f-add").value=""; $("f-sub").value="";
+    $("txnBox").hidden=!id; $("f-add").value=""; $("f-sub").value=""; $("f-note").value="";
     updatePriceLabel(); $("dlg").showModal();
   }
   $("btnAdd").onclick=()=>openForm(null);
@@ -664,7 +669,8 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
         holdings=holdings.map(h=>h.id===editingId?{id:editingId,...doc}:h);
         const ch=diffAsset(old,doc);
         stamp();
-        if(ch.length) record({action:"edit",asset:assetRef({id:editingId,...doc}),changes:ch,before,txn});
+        const note=$("txnBox").hidden?"":$("f-note").value.replace(/\s+/g," ").trim().slice(0,200);
+        if(ch.length||note) record({action:"edit",asset:assetRef({id:editingId,...doc}),changes:ch,before,txn,...(note?{note}:{})});
         save();
       }else{
         const nh={id:newId(),...doc}; holdings.push(nh); stamp();
@@ -1118,7 +1124,8 @@ input,select{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;co
         if(e.txn){ const q=v=>e.txn.unit==="amount"?priceFmt(v,e.txn.cur||"PHP"):qtyFmt(v)+" units";
           det=[e.txn.add?`${e.txn.unit==="amount"?"Deposited":"Added"} <b>${q(e.txn.add)}</b>`:"",e.txn.sub?`${e.txn.unit==="amount"?"Withdrew":"Sold"} <b>${q(e.txn.sub)}</b>`:""].filter(Boolean).join(" · ")+"<br>"; }
         else det="";
-        det+=(e.changes||[]).map(c=>`${c.f==="price"&&e.txn&&e.txn.unit==="amount"?"Amount":(LABEL[c.f]||c.f)} <b>${fmtVal(c,"a")}</b> → <b>${fmtVal(c,"b")}</b>`).join("<br>"); break;
+        det+=(e.changes||[]).map(c=>`${c.f==="price"&&e.txn&&e.txn.unit==="amount"?"Amount":(LABEL[c.f]||c.f)} <b>${fmtVal(c,"a")}</b> → <b>${fmtVal(c,"b")}</b>`).join("<br>");
+        if(e.note) det+=`${det?"<br>":""}<span class="evnote">“${esc(e.note)}”</span>`; break;
       case "delete": tag='<span class="tag del">Deleted</span>'; what=esc(a.name); det=`${esc(a.type||"")} · ${where} · was ${phpShort(e.value||0)}`; break;
       case "settings": tag='<span class="tag edit">Settings</span>'; what="FX & date";
         det=(e.changes||[]).map(c=>`${LABEL[c.f]||c.f} <b>${fmtVal(c,"a")}</b> → <b>${fmtVal(c,"b")}</b>`).join("<br>"); break;
