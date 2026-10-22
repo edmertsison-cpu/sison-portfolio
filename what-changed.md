@@ -8,6 +8,29 @@ Each version has a matching cache name in `sw.js` (`portfolio-vN`). After upload
 
 ---
 
+## v11 — 2026-10-22
+**Credit card tracking, page rename, Title Case**
+- "Investment details (Soon)" is now **Accounts & Investment Details**.
+- New **Credit Cards** section on that page. For each card:
+  - Cut-off day of the month, with the next cut-off date shown
+  - Statement due date and due amount
+  - Paid / settled on (date), and whether the whole amount or the minimum was paid
+  - Credit limit, with the statement amount as % of the limit
+- Status for each card: *Overdue*, *Due today*, *Due in N days* (5 days or less), *Paid in full*, or *Paid minimum*. Cards needing attention sort to the top.
+- Summary: unpaid amount due, next due date, and total credit limit.
+- One-tap **Paid Whole Amount** / **Paid Minimum** buttons fill in today's date.
+- **New Statement** (in the edit form) clears the due date, amount, and payment for the next billing cycle.
+- The side menu shows a red "N due" badge when a card is overdue or due within 5 days.
+- Card changes are logged in History and sync through Google Drive and backups.
+- Credit card amounts are not counted in Gross Portfolio.
+- Card names accept **letters and spaces only** (accented letters like Ñ are fine). Numbers and symbols are removed as you type, so card numbers can never be entered.
+- **Add or remove on any asset:** editing an asset now shows **Added / Deposited** and **Sold / Withdrawn**.
+  - For assets with positions, the values are shares/units added to or subtracted from current positions.
+  - For assets without positions (cash, MP2, bonds), the values are amounts added to or subtracted from the total.
+  - A live preview shows the new positions or amount and the new total value before you save. Selling or withdrawing more than you hold is blocked.
+  - History records each one, e.g. *Added 50,000 units · Sold 20,000 units* or *Deposited ₱25,000 · Withdrew ₱5,000*.
+- Titles and header buttons now use Title Case (e.g. *By Asset Type*, *Philippine Assets*, *Add Asset*, *FX & Date*). **SISON FAMILY PORTFOLIO** and **GROSS PORTFOLIO** stay all caps.
+
 ## v10 — 2026-10-11
 **App lock with Face ID / fingerprint**
 - New **App lock** item in the side menu. When it's on, the app asks for Face ID, fingerprint, or the phone passcode (whichever the phone has set up) when it opens, and again when you return after more than 1 minute away.
